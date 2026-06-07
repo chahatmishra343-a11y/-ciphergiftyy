@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CipherGiftyy — Text Bloom</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IM+Fell+English:ital@0;1&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --ivory:#FAF8F5;--linen:#F3EFE8;--ink:#2C2523;--sepia:#5C3D2E;
+  --rose:#C9847A;--gold:#C9A96E;--gold-light:#E8D5A3;
+}
+
+/* THEMES */
+body.theme-love {
+  --bg:#FFF0F3;--bg2:#FFE0E8;--accent:#E8547A;--accent2:#FF8FAB;
+  --text:#3D1A24;--petal1:rgba(232,84,122,;--petal2:rgba(255,143,171,;--petal3:rgba(255,192,203,;
+  --emoji-set:"🌹❤️💕🌸💗🌺💝✨";
+}
+body.theme-missing {
+  --bg:#EEF4FF;--bg2:#D6E4FF;--accent:#4A7FCB;--accent2:#7BA7E8;
+  --text:#0D1B3E;--petal1:rgba(74,127,203,;--petal2:rgba(123,167,232,;--petal3:rgba(173,210,255,;
+  --emoji-set:"🌙⭐💙🌟✨💫🌊🕊️";
+}
+body.theme-cute {
+  --bg:#FFF8FC;--bg2:#FFE8F7;--accent:#FF8ED4;--accent2:#FFB3E6;
+  --text:#3D1535;--petal1:rgba(255,142,212,;--petal2:rgba(255,179,230,;--petal3:rgba(255,218,247,;
+  --emoji-set:"🐼⭐🌸✨💕🍡🎀🌈";
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{
+  min-height:100vh;
+  background:var(--bg, #FAF8F5);
+  font-family:'Lora',serif;
+  color:var(--text, #2C2523);
+  cursor:none;
+  overflow-x:hidden;
+  transition:background 0.5s ease;
+}
+.cursor{width:10px;height:10px;border-radius:50%;background:var(--accent,#C9847A);position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply;}
+.cursor-ring{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--accent,#C9A96E);position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:left 0.1s,top 0.1s;}
+
+/* CANVAS */
+#petals-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+
+/* HEADER */
+header{position:relative;z-index:10;padding:1.5rem 2.5rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(201,169,110,0.2);}
+.back-home{font-family:'Lora',serif;font-style:italic;font-size:0.75rem;letter-spacing:0.12em;color:var(--gold);text-decoration:none;transition:color 0.3s;}
+.back-home:hover{color:var(--sepia);}
+.logo{font-family:'IM Fell English',serif;font-size:1.1rem;color:var(--ink);}
+.logo span{color:var(--gold);}
+
+/* SCREENS */
+.screen{display:none;position:relative;z-index:10;}
+.screen.active{display:block;}
+
+/* ===================== */
+/* SCREEN 1 — COMPOSER  */
+/* ===================== */
+.composer{max-width:680px;margin:0 auto;padding:3rem 2rem 5rem;}
+.section-label{font-family:'Lora',serif;font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1rem;}
+.section-label::before,.section-label::after{content:'';display:inline-block;width:40px;height:1px;background:var(--gold-light);}
+.composer-title{font-family:'IM Fell English',serif;font-size:2.2rem;font-style:italic;color:var(--ink);text-align:center;margin-bottom:0.5rem;}
+.composer-sub{font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--sepia);text-align:center;line-height:1.8;margin-bottom:3rem;}
+
+/* THEME PICKER */
+.theme-label{font-family:'Lora',serif;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;}
+.theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2.5rem;}
+.theme-card{
+  border:1.5px solid rgba(201,169,110,0.25);
+  border-radius:12px;padding:1.5rem 1rem;
+  cursor:none;transition:all 0.3s ease;
+  text-align:center;position:relative;overflow:hidden;
+}
+.theme-card.selected{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,169,110,0.2);}
+.theme-card:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,0.08);}
+.theme-love{background:linear-gradient(135deg,#FFF0F3,#FFD6E2);}
+.theme-missing{background:linear-gradient(135deg,#EEF4FF,#D0E4FF);}
+.theme-cute{background:linear-gradient(135deg,#FFF0FA,#FFD6F0);}
+.theme-emoji{font-size:1.8rem;margin-bottom:0.5rem;}
+.theme-name{font-family:'IM Fell English',serif;font-size:0.9rem;font-style:italic;color:var(--ink);}
+.theme-desc{font-family:'Lora',serif;font-size:0.65rem;color:var(--sepia);margin-top:0.3rem;font-style:italic;}
+.theme-check{position:absolute;top:0.6rem;right:0.6rem;width:18px;height:18px;border-radius:50%;background:var(--gold);display:none;align-items:center;justify-content:center;font-size:0.6rem;color:white;}
+.theme-card.selected .theme-check{display:flex;}
+
+/* FORM FIELDS */
+.field-group{margin-bottom:1.8rem;}
+.field-label{font-family:'Lora',serif;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.6rem;display:block;}
+.field-input{
+  width:100%;
+  background:var(--linen);
+  border:1px solid rgba(201,169,110,0.3);
+  border-radius:4px;
+  padding:0.9rem 1.2rem;
+  font-family:'Cormorant Garamond',serif;
+  font-size:1rem;font-style:italic;
+  color:var(--sepia);outline:none;
+  transition:border-color 0.3s;
+  cursor:text;
+}
+.field-input:focus{border-color:var(--gold);}
+.field-textarea{
+  width:100%;min-height:200px;
+  background:var(--linen);
+  border:1px solid rgba(201,169,110,0.3);
+  border-radius:4px;
+  padding:1rem 1.2rem;
+  font-family:'Cormorant Garamond',serif;
+  font-size:1rem;font-style:italic;line-height:1.9;
+  color:var(--sepia);outline:none;resize:none;
+  transition:border-color 0.3s;cursor:text;
+}
+.field-textarea:focus{border-color:var(--gold);}
+
+/* PRESETS */
+.presets-label{font-family:'Lora',serif;font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--sepia);margin-bottom:0.8rem;display:block;}
+.presets-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.6rem;margin-bottom:1.5rem;}
+.preset-btn{
+  background:var(--linen);
+  border:1px solid rgba(201,169,110,0.25);
+  border-radius:4px;
+  padding:0.6rem 0.8rem;
+  font-family:'Lora',serif;font-style:italic;
+  font-size:0.72rem;color:var(--sepia);
+  cursor:none;transition:all 0.3s;text-align:left;
+}
+.preset-btn:hover{border-color:var(--gold);color:var(--ink);}
+
+.deckle-edge{width:100%;height:6px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='6'%3E%3Cpath d='M0 6 Q5 0 10 6 Q15 0 20 6 Q25 0 30 6 Q35 0 40 6' fill='none' stroke='%23C9A96E' stroke-width='0.8' stroke-opacity='0.4'/%3E%3C/svg%3E") repeat-x center;margin:1.5rem 0;}
+
+.btn-primary{width:100%;padding:1rem;background:var(--ink);color:var(--ivory);font-family:'Lora',serif;font-size:0.75rem;letter-spacing:0.18em;text-transform:uppercase;border:none;border-radius:4px;cursor:none;transition:all 0.3s;}
+.btn-primary:hover{background:var(--sepia);transform:translateY(-2px);}
+
+/* ========================= */
+/* SCREEN 2 — BLOOM PREVIEW  */
+/* ========================= */
+#bloom-screen{
+  position:fixed;inset:0;z-index:200;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.5s;
+  overflow:hidden;
+}
+#bloom-screen.active-bloom{opacity:1;pointer-events:all;}
+#bloom-bg{position:absolute;inset:0;background:var(--bg,#FAF8F5);transition:background 0.5s;}
+#bloom-canvas{position:absolute;inset:0;width:100%;height:100%;}
+
+/* TAP TO REVEAL */
+.tap-hint{
+  position:relative;z-index:10;
+  font-family:'Lora',serif;font-style:italic;
+  font-size:0.85rem;letter-spacing:0.15em;
+  color:var(--accent,#C9847A);
+  animation:gentlePulse 2s ease infinite;
+  text-align:center;
+}
+@keyframes gentlePulse{0%,100%{opacity:0.5;transform:scale(1);}50%{opacity:1;transform:scale(1.04);}}
+
+/* MESSAGE REVEAL */
+.message-reveal{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:3rem 2rem;
+  opacity:0;
+  transition:opacity 1.2s ease;
+  pointer-events:none;
+  z-index:20;
+}
+.message-reveal.visible{opacity:1;pointer-events:all;}
+.message-paper{
+  max-width:520px;width:100%;
+  background:rgba(255,255,255,0.85);
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(201,169,110,0.3);
+  border-radius:8px;
+  padding:3rem 2.5rem;
+  box-shadow:0 20px 60px rgba(0,0,0,0.1);
+  position:relative;
+  animation:floatUp 1s ease both;
+}
+@keyframes floatUp{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.message-paper::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:60%;height:2px;background:linear-gradient(90deg,transparent,var(--accent,#C9847A),transparent);}
+.message-dear{
+  font-family:'IM Fell English',serif;
+  font-size:1.1rem;font-style:italic;
+  color:var(--accent,#C9847A);
+  margin-bottom:1.2rem;
+  display:block;
+}
+.message-body{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.05rem;font-style:italic;
+  line-height:2;color:var(--text,#2C2523);
+  white-space:pre-line;
+  margin-bottom:1.5rem;
+}
+.message-from{
+  font-family:'Lora',serif;font-style:italic;
+  font-size:0.78rem;color:var(--accent,#C9847A);
+  letter-spacing:0.08em;text-align:right;
+  display:block;
+}
+.thin-rule{width:50%;height:1px;margin:1.2rem auto;background:linear-gradient(90deg,transparent,rgba(201,169,110,0.4),transparent);}
+.close-bloom{
+  margin-top:1.5rem;
+  font-family:'Lora',serif;font-style:italic;
+  font-size:0.7rem;letter-spacing:0.12em;
+  color:var(--sepia);cursor:none;
+  background:none;border:none;
+  transition:color 0.3s;
+}
+.close-bloom:hover{color:var(--ink);}
+
+/* =================== */
+/* SCREEN 3 — SHARE    */
+/* =================== */
+.share-screen{max-width:500px;margin:0 auto;padding:4rem 2rem;text-align:center;}
+.share-icon{font-size:3rem;margin-bottom:1.5rem;}
+.share-title{font-family:'IM Fell English',serif;font-size:1.8rem;font-style:italic;color:var(--ink);margin-bottom:0.8rem;}
+.share-sub{font-family:'Lora',serif;font-style:italic;font-size:0.8rem;color:var(--sepia);line-height:1.8;margin-bottom:2rem;}
+.share-link-box{background:var(--linen);border:1px solid rgba(201,169,110,0.4);border-radius:4px;padding:1rem 1.5rem;font-family:'Lora',serif;font-size:0.72rem;color:var(--sepia);margin-bottom:1.5rem;word-break:break-all;cursor:none;transition:border-color 0.3s;}
+.share-link-box:hover{border-color:var(--gold);}
+.share-actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+.btn-secondary{padding:0.8rem 2rem;background:transparent;color:var(--sepia);font-family:'Lora',serif;font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;border:1px solid rgba(201,169,110,0.5);border-radius:2px;cursor:none;transition:all 0.3s;}
+.btn-secondary:hover{border-color:var(--gold);color:var(--ink);}
+.copy-confirm{margin-top:1rem;font-family:'Lora',serif;font-style:italic;font-size:0.68rem;color:#8A9F8A;display:none;}
+
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@media(max-width:600px){
+  .composer{padding:2rem 1rem 4rem;}
+  .theme-grid{grid-template-columns:1fr;}
+  .presets-grid{grid-template-columns:1fr;}
+  .message-paper{padding:2rem 1.5rem;}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+<canvas id="petals-canvas"></canvas>
+
+<header>
+  <a href="index.html" class="back-home">← Return to the Garden</a>
+  <div class="logo">✦ Cipher<span>Giftyy</span></div>
+  <div style="font-family:'Lora',serif;font-style:italic;font-size:0.7rem;color:var(--sepia);">Text Bloom</div>
+</header>
+
+<!-- SCREEN 1: COMPOSER -->
+<div class="screen active" id="screen-composer">
+  <div class="composer" style="animation:fadeSlideUp 0.8s ease both;">
+    <div class="section-label">Text Bloom</div>
+    <div class="composer-title">Let your words bloom.</div>
+    <div class="composer-sub">Choose a theme. Write your message. They will open a link and watch your words appear — like flowers after rain.</div>
+
+    <!-- THEME PICKER -->
+    <div class="field-group">
+      <div class="theme-label">Choose Your Theme</div>
+      <div class="theme-grid">
+        <div class="theme-card theme-love selected" onclick="selectTheme('love')" id="theme-love">
+          <div class="theme-check">✓</div>
+          <div class="theme-emoji">🌹</div>
+          <div class="theme-name">Love</div>
+          <div class="theme-desc">Pink roses, warm hearts</div>
+        </div>
+        <div class="theme-card theme-missing" onclick="selectTheme('missing')" id="theme-missing">
+          <div class="theme-check">✓</div>
+          <div class="theme-emoji">🌙</div>
+          <div class="theme-name">Missing You</div>
+          <div class="theme-desc">Soft blue, moon & stars</div>
+        </div>
+        <div class="theme-card theme-cute" onclick="selectTheme('cute')" id="theme-cute">
+          <div class="theme-check">✓</div>
+          <div class="theme-emoji">🐼</div>
+          <div class="theme-name">Cute</div>
+          <div class="theme-desc">Pastel pandas & stars</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NAME -->
+    <div class="field-group">
+      <label class="field-label">Their Name</label>
+      <input class="field-input" id="recipient-name" type="text" placeholder="Sarah, Rohan, My Love..."/>
+    </div>
+
+    <!-- MESSAGE -->
+    <div class="field-group">
+      <label class="field-label">Your Message</label>
+      <span class="presets-label">Choose a starter or write your own ↓</span>
+      <div class="presets-grid">
+        <button class="preset-btn" onclick="usePreset('love')">🌹 I love you more than words</button>
+        <button class="preset-btn" onclick="usePreset('miss')">🌙 I miss you every single day</button>
+        <button class="preset-btn" onclick="usePreset('proud')">✨ I am so proud of you</button>
+        <button class="preset-btn" onclick="usePreset('happy')">🌸 You make me so happy</button>
+        <button class="preset-btn" onclick="usePreset('beautiful')">💕 You are so beautiful to me</button>
+        <button class="preset-btn" onclick="usePreset('grateful')">🌿 I am so grateful for you</button>
+        <button class="preset-btn" onclick="usePreset('birthday')">🎂 Happy Birthday my beloved</button>
+        <button class="preset-btn" onclick="usePreset('distance')">💙 Distance can't stop my love</button>
+      </div>
+      <textarea class="field-textarea" id="message-body" placeholder="Write your message here... it can be as long or as short as your heart needs."></textarea>
+    </div>
+
+    <!-- FROM -->
+    <div class="field-group">
+      <label class="field-label">From (optional)</label>
+      <input class="field-input" id="sender-name" type="text" placeholder="Your name, or leave blank for mystery..."/>
+    </div>
+
+    <div class="deckle-edge"></div>
+    <button class="btn-primary" onclick="previewBloom()">Create My Text Bloom ✦</button>
+  </div>
+</div>
+
+<!-- SCREEN 2: SHARE -->
+<div class="screen" id="screen-share">
+  <div class="share-screen" style="animation:fadeSlideUp 0.8s ease both;">
+    <div class="share-icon">🌸</div>
+    <div class="share-title">Your bloom is ready.</div>
+    <div class="share-sub">Send this link to your beloved.<br/>When they open it, flowers will bloom — and then your words will appear.</div>
+    <div class="share-link-box" id="share-link-display" onclick="copyLink()">Click to copy ✦</div>
+    <div class="share-actions">
+      <button class="btn-primary" style="width:auto;padding:0.8rem 2rem;" onclick="copyLink()">Copy Link ✦</button>
+      <button class="btn-secondary" onclick="previewBloom()">Preview It First</button>
+      <button class="btn-secondary" onclick="showScreen('screen-composer')">Make Another</button>
+    </div>
+    <div class="copy-confirm" id="copy-confirm">✦ Copied! Now send it with love. ✦</div>
+  </div>
+</div>
+
+<!-- BLOOM SCREEN (overlay) -->
+<div id="bloom-screen">
+  <div id="bloom-bg"></div>
+  <canvas id="bloom-canvas"></canvas>
+  <div class="tap-hint" id="tap-hint">✦ &nbsp;tap anywhere to bloom&nbsp; ✦</div>
+  <div class="message-reveal" id="message-reveal">
+    <div class="message-paper">
+      <span class="message-dear" id="reveal-dear">Dear Sarah,</span>
+      <div class="thin-rule"></div>
+      <div class="message-body" id="reveal-body"></div>
+      <div class="thin-rule"></div>
+      <span class="message-from" id="reveal-from"></span>
+    </div>
+    <button class="close-bloom" onclick="closeBloom()">← close this bloom</button>
+  </div>
+</div>
+
+<script>
+// Cursor
+const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+document.addEventListener('mousemove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px';setTimeout(()=>{ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px';},80);});
+
+// Theme
+let currentTheme='love';
+const themes={
+  love:{bg:'#FFF0F3',bg2:'#FFE0E8',accent:'#E8547A',text:'#3D1A24',petals:['rgba(232,84,122,','rgba(255,143,171,','rgba(255,192,203,'],symbols:['🌹','❤️','💕','🌸','💗']},
+  missing:{bg:'#EEF4FF',bg2:'#D6E4FF',accent:'#4A7FCB',text:'#0D1B3E',petals:['rgba(74,127,203,','rgba(123,167,232,','rgba(173,210,255,'],symbols:['🌙','⭐','💙','🌟','✨']},
+  cute:{bg:'#FFF8FC',bg2:'#FFE8F7',accent:'#FF8ED4',text:'#3D1535',petals:['rgba(255,142,212,','rgba(255,179,230,','rgba(255,218,247,'],symbols:['🐼','⭐','🌸','✨','💕']}
+};
+
+function selectTheme(t){
+  currentTheme=t;
+  document.querySelectorAll('.theme-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('theme-'+t).classList.add('selected');
+  const th=themes[t];
+  document.body.style.background=th.bg;
+}
+
+const presets={
+  love:`I love you.\nNot in a simple way.\nNot in a way that fits inside ordinary words.\n\nI love you in the way that makes ordinary days feel extraordinary.\nIn the way that makes me grateful just to exist in the same world as you.\n\nYou are my favorite thing about being alive.`,
+  miss:`I miss you.\n\nNot in the dramatic way people describe in movies.\nIn the quiet way.\n\nThe way a song reminds me of you.\nThe way I reach for my phone to tell you something funny.\nThe way everything feels slightly incomplete when you're not here.\n\nI miss you. Every single day.`,
+  proud:`I just want you to know something.\n\nI am so proud of you.\n\nNot because you're perfect.\nNot because you never make mistakes.\nBecause you keep going.\nBecause you try again.\nBecause you are becoming someone truly remarkable.\n\nI see it. Even when you don't.`,
+  happy:`You make me happy.\n\nNot in a grand, dramatic way.\nIn the small, everyday way that matters more.\n\nYour laugh makes things lighter.\nYour presence makes things warmer.\nYour existence in my life makes everything feel like it has meaning.\n\nThank you for making me so happy.`,
+  beautiful:`You are so beautiful to me.\n\nNot just the way you look.\nThe way you think.\nThe way you care.\nThe way you exist so effortlessly in a world that asks everyone to try so hard.\n\nYou are one of the most beautiful things I have ever seen.`,
+  grateful:`I am grateful for you.\n\nFor every conversation.\nFor every moment of kindness.\nFor every time you stayed when leaving would have been easier.\n\nYou make this life feel less heavy.\nAnd that is one of the greatest gifts one person can give another.\n\nThank you for existing.`,
+  birthday:`Happy Birthday.\n\nAnother year chose you.\nAnother year of your laughter, your dreams, your strange beautiful habits.\n\nI hope today feels as warm as you make every day feel for the people around you.\n\nYou deserve every good thing.\nToday and always.\n\nHappy Birthday, my beloved.`,
+  distance:`Distance is just a word.\n\nIt cannot stop what I feel.\nIt cannot interrupt the way I think of you.\nIt cannot silence the love that travels through every mile between us.\n\nOne day the distance will be gone.\nAnd until that day,\nknow that you are never far from my heart.`
+};
+
+function usePreset(key){document.getElementById('message-body').value=presets[key];}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// BLOOM LOGIC
+let bloomPhase=0; // 0=waiting, 1=blooming, 2=message
+let bloomParticles=[];
+let bloomCanvas,bloomCtx,bloomW,bloomH;
+let animFrame;
+
+function previewBloom(){
+  const name=document.getElementById('recipient-name').value.trim()||'My Love';
+  const body=document.getElementById('message-body').value.trim();
+  const from=document.getElementById('sender-name').value.trim();
+  if(!body){alert('Please write a message first. 🌸');return;}
+  
+  // Set reveal content
+  document.getElementById('reveal-dear').textContent='Dear '+name+',';
+  document.getElementById('reveal-body').textContent=body;
+  document.getElementById('reveal-from').textContent=from?'With love, '+from:'With love 🌸';
+  
+  // Set theme
+  const th=themes[currentTheme];
+  document.getElementById('bloom-bg').style.background=th.bg;
+  
+  // Show bloom screen
+  const bs=document.getElementById('bloom-screen');
+  bs.classList.add('active-bloom');
+  document.getElementById('tap-hint').style.opacity='1';
+  document.getElementById('message-reveal').classList.remove('visible');
+  bloomPhase=0;
+  
+  // Init bloom canvas
+  bloomCanvas=document.getElementById('bloom-canvas');
+  bloomCtx=bloomCanvas.getContext('2d');
+  bloomW=bloomCanvas.width=window.innerWidth;
+  bloomH=bloomCanvas.height=window.innerHeight;
+  bloomParticles=[];
+  
+  if(animFrame)cancelAnimationFrame(animFrame);
+  animateBloom();
+  
+  // Generate share link
+  const data={theme:currentTheme,name,body,from};
+  const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+  const link=window.location.origin+'/bloom-view.html?data='+encoded;
+  document.getElementById('share-link-display').textContent=link;
+}
+
+document.getElementById('bloom-screen').addEventListener('click',function(e){
+  if(e.target.classList.contains('close-bloom'))return;
+  if(bloomPhase===0){
+    bloomPhase=1;
+    spawnFlowers();
+    document.getElementById('tap-hint').style.opacity='0';
+    setTimeout(()=>{
+      bloomPhase=2;
+      // fade message in
+      document.getElementById('message-reveal').classList.add('visible');
+      // fade flowers out
+      bloomParticles.forEach(p=>p.fading=true);
+    },2200);
+  }
+});
+
+function spawnFlowers(){
+  const th=themes[currentTheme];
+  for(let i=0;i<120;i++){
+    setTimeout(()=>{
+      bloomParticles.push(new BloomPetal(th));
+    },i*18);
+  }
+}
+
+class BloomPetal{
+  constructor(th){
+    this.th=th;
+    // Start from random point and explode outward
+    const cx=bloomW/2,cy=bloomH/2;
+    const angle=Math.random()*Math.PI*2;
+    const dist=Math.random()*Math.min(bloomW,bloomH)*0.1;
+    this.x=cx+Math.cos(angle)*dist;
+    this.y=cy+Math.sin(angle)*dist;
+    this.tx=Math.random()*bloomW;
+    this.ty=Math.random()*bloomH;
+    this.size=Math.random()*18+8;
+    this.opacity=0;
+    this.targetOpacity=Math.random()*0.7+0.3;
+    this.rotation=Math.random()*Math.PI*2;
+    this.rotSpeed=(Math.random()-0.5)*0.03;
+    this.color=th.petals[Math.floor(Math.random()*th.petals.length)];
+    this.useEmoji=Math.random()<0.25;
+    this.emoji=th.symbols[Math.floor(Math.random()*th.symbols.length)];
+    this.vx=(this.tx-this.x)*0.04;
+    this.vy=(this.ty-this.y)*0.04;
+    this.fading=false;
+    this.wobble=Math.random()*Math.PI*2;
+  }
+  update(){
+    this.x+=this.vx*(this.fading?2:1);
+    this.y+=this.vy*(this.fading?2:1);
+    this.wobble+=0.03;
+    this.x+=Math.sin(this.wobble)*0.4;
+    this.rotation+=this.rotSpeed;
+    if(this.fading){
+      this.opacity-=0.025;
+    } else {
+      this.opacity=Math.min(this.opacity+0.05,this.targetOpacity);
+    }
+  }
+  draw(ctx){
+    ctx.save();
+    ctx.translate(this.x,this.y);
+    ctx.rotate(this.rotation);
+    ctx.globalAlpha=Math.max(0,this.opacity);
+    if(this.useEmoji){
+      ctx.font=this.size+'px serif';
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(this.emoji,0,0);
+    } else {
+      ctx.fillStyle=this.color+'1)';
+      ctx.beginPath();
+      ctx.ellipse(0,0,this.size*0.4,this.size,0,0,Math.PI*2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+}
+
+function animateBloom(){
+  bloomCtx.clearRect(0,0,bloomW,bloomH);
+  bloomParticles=bloomParticles.filter(p=>p.opacity>0||!p.fading);
+  bloomParticles.forEach(p=>{p.update();p.draw(bloomCtx);});
+  animFrame=requestAnimationFrame(animateBloom);
+}
+
+function closeBloom(){
+  document.getElementById('bloom-screen').classList.remove('active-bloom');
+  cancelAnimationFrame(animFrame);
+  showScreen('screen-share');
+}
+
+function copyLink(){
+  const link=document.getElementById('share-link-display').textContent;
+  navigator.clipboard.writeText(link).then(()=>{
+    const c=document.getElementById('copy-confirm');
+    c.style.display='block';
+    setTimeout(()=>c.style.display='none',3000);
+  });
+}
+
+// Background canvas petals
+const canvas=document.getElementById('petals-canvas'),ctx=canvas.getContext('2d');
+let W=canvas.width=window.innerWidth,H=canvas.height=window.innerHeight;
+window.addEventListener('resize',()=>{W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;});
+let mouse={x:W/2,y:H/2};
+document.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;});
+const bgColors=['rgba(232,180,173,','rgba(201,132,122,','rgba(201,169,110,','rgba(138,159,138,'];
+class P{constructor(){this.reset(true);}reset(i){this.x=Math.random()*W;this.y=i?Math.random()*H:-30;this.size=Math.random()*5+2;this.speedY=Math.random()*0.4+0.15;this.speedX=(Math.random()-0.5)*0.2;this.opacity=Math.random()*0.25+0.08;this.rotation=Math.random()*Math.PI*2;this.rotSpeed=(Math.random()-0.5)*0.01;this.color=bgColors[Math.floor(Math.random()*bgColors.length)];this.wobble=Math.random()*Math.PI*2;this.wobbleSpeed=Math.random()*0.01+0.003;}update(){this.wobble+=this.wobbleSpeed;this.x+=this.speedX+Math.sin(this.wobble)*0.2;this.y+=this.speedY;this.rotation+=this.rotSpeed;if(this.y>H+20)this.reset(false);}draw(){ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.rotation);ctx.globalAlpha=this.opacity;ctx.fillStyle=this.color+'1)';ctx.beginPath();ctx.ellipse(0,0,this.size,this.size*1.6,0,0,Math.PI*2);ctx.fill();ctx.restore();}}
+const bgParticles=Array.from({length:30},()=>new P());
+function bgAnimate(){ctx.clearRect(0,0,W,H);bgParticles.forEach(p=>{p.update();p.draw();});requestAnimationFrame(bgAnimate);}
+bgAnimate();
+</script>
+</body>
+</html>
