@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CipherGiftyy — A Letter For You</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IM+Fell+English:ital@0;1&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ivory:#FAF8F5;--linen:#F3EFE8;--ink:#2C2523;--sepia:#5C3D2E;
+    --rose:#C9847A;--gold:#C9A96E;--gold-light:#E8D5A3;--sage:#8A9F8A;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{min-height:100vh;background:var(--ivory);font-family:'Lora',serif;color:var(--ink);cursor:none;overflow-x:hidden;}
+  .cursor{width:10px;height:10px;border-radius:50%;background:var(--rose);position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply;}
+  .cursor-ring{width:30px;height:30px;border-radius:50%;border:1px solid var(--gold);position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:left 0.1s,top 0.1s;}
+  #petals-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+
+  /* ENVELOPE OPENING */
+  .envelope-screen{
+    position:fixed;inset:0;z-index:50;
+    background:var(--ivory);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    transition:opacity 1s ease;
+  }
+  .envelope-screen.hidden{opacity:0;pointer-events:none;}
+  .envelope-wrap{position:relative;width:200px;height:140px;cursor:none;}
+  .envelope-body{
+    width:200px;height:140px;
+    background:var(--linen);
+    border:1px solid rgba(201,169,110,0.4);
+    border-radius:4px;
+    position:relative;
+    box-shadow:0 10px 40px rgba(44,37,35,0.1);
+  }
+  .envelope-flap{
+    position:absolute;top:0;left:0;right:0;
+    height:70px;
+    background:var(--linen);
+    border:1px solid rgba(201,169,110,0.4);
+    border-bottom:none;
+    border-radius:4px 4px 0 0;
+    clip-path:polygon(0 0,100% 0,50% 100%);
+    transform-origin:top center;
+    transition:transform 1s ease;
+    z-index:2;
+  }
+  .envelope-flap.open{transform:rotateX(180deg);}
+  .envelope-seal{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:36px;height:36px;
+    background:var(--rose);
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:1rem;color:white;
+    box-shadow:0 2px 10px rgba(201,132,122,0.4);
+    z-index:3;cursor:none;
+    transition:transform 0.3s,opacity 0.5s;
+  }
+  .envelope-seal:hover{transform:translate(-50%,-50%) scale(1.1);}
+  .envelope-hint{
+    margin-top:2rem;
+    font-family:'Lora',serif;font-style:italic;
+    font-size:0.8rem;color:var(--gold);
+    letter-spacing:0.1em;
+    animation:pulse 2s ease infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:0.6;}50%{opacity:1;}}
+
+  /* LETTER SCREEN */
+  .letter-screen{
+    position:relative;z-index:10;
+    max-width:620px;margin:0 auto;
+    padding:4rem 2rem 6rem;
+    opacity:0;
+    transition:opacity 1s ease;
+  }
+  .letter-screen.visible{opacity:1;}
+  .letter-from{
+    text-align:center;margin-bottom:2.5rem;
+    font-family:'Lora',serif;font-style:italic;
+    font-size:0.7rem;letter-spacing:0.2em;
+    text-transform:uppercase;color:var(--gold);
+  }
+  .letter-paper{
+    background:var(--linen);
+    border:1px solid rgba(201,169,110,0.3);
+    border-radius:4px;
+    padding:3.5rem 3rem;
+    box-shadow:0 20px 60px rgba(44,37,35,0.08);
+    position:relative;
+  }
+  .letter-paper::before{
+    content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+    width:60%;height:2px;
+    background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  }
+  .thin-rule{width:50%;height:1px;margin:1.5rem auto;background:linear-gradient(90deg,transparent,var(--gold-light),transparent);}
+  .letter-content{
+    font-family:'Cormorant Garamond',serif;
+    font-size:1.05rem;font-style:italic;
+    line-height:2.1;color:var(--sepia);
+    white-space:pre-line;
+  }
+  .letter-footer{
+    text-align:center;margin-top:3rem;
+    font-family:'Lora',serif;font-style:italic;
+    font-size:0.68rem;color:var(--gold);
+    letter-spacing:0.1em;
+  }
+  .letter-footer a{color:var(--rose);text-decoration:none;}
+  .letter-footer a:hover{color:var(--sepia);}
+  @keyframes fadeSlideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+  @media(max-width:600px){.letter-paper{padding:2rem 1.5rem;}.letter-screen{padding:2rem 1rem 4rem;}}
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+<canvas id="petals-canvas"></canvas>
+
+<!-- ENVELOPE -->
+<div class="envelope-screen" id="envelope-screen">
+  <div class="envelope-wrap" onclick="openEnvelope()">
+    <div class="envelope-body"></div>
+    <div class="envelope-flap" id="flap"></div>
+    <div class="envelope-seal" id="seal">🌸</div>
+  </div>
+  <div class="envelope-hint">Tap to open your letter ✦</div>
+</div>
+
+<!-- LETTER -->
+<div class="letter-screen" id="letter-screen">
+  <div class="letter-from">A letter arrived for you ✦ CipherGiftyy</div>
+  <div class="letter-paper">
+    <div class="thin-rule"></div>
+    <div class="letter-content" id="letter-content"></div>
+    <div class="thin-rule"></div>
+  </div>
+  <div class="letter-footer">
+    Made with love on <a href="index.html">CipherGiftyy</a> &nbsp;✦&nbsp;
+    A gift that lives in a link 🌸
+  </div>
+</div>
+
+<script>
+const cursor=document.getElementById('cursor');
+const ring=document.getElementById('cursor-ring');
+document.addEventListener('mousemove',e=>{
+  cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px';
+  setTimeout(()=>{ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px';},80);
+});
+
+// Read letter from URL
+const params = new URLSearchParams(window.location.search);
+const encoded = params.get('letter');
+if (encoded) {
+  try {
+    const decoded = decodeURIComponent(escape(atob(encoded)));
+    document.getElementById('letter-content').textContent = decoded;
+  } catch(e) {
+    document.getElementById('letter-content').textContent = 'This letter could not be opened. It may have been changed. 🌸';
+  }
+} else {
+  document.getElementById('letter-content').textContent = 'No letter found. 🌸\n\nPerhaps it is still being written for you.';
+}
+
+function openEnvelope() {
+  document.getElementById('flap').classList.add('open');
+  document.getElementById('seal').style.opacity = '0';
+  setTimeout(() => {
+    document.getElementById('envelope-screen').classList.add('hidden');
+    const ls = document.getElementById('letter-screen');
+    ls.style.display = 'block';
+    setTimeout(() => ls.classList.add('visible'), 100);
+  }, 1200);
+}
+
+// Canvas
+const canvas=document.getElementById('petals-canvas');
+const ctx=canvas.getContext('2d');
+let W=canvas.width=window.innerWidth,H=canvas.height=window.innerHeight;
+window.addEventListener('resize',()=>{W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;});
+let mouse={x:W/2,y:H/2};
+document.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;});
+const colors=['rgba(232,180,173,','rgba(201,132,122,','rgba(201,169,110,','rgba(138,159,138,'];
+const symbols=['♡','✉','✦','❀','✿'];
+class P{
+  constructor(){this.reset(true);}
+  reset(init){
+    this.x=Math.random()*W;this.y=init?Math.random()*H:-30;
+    this.size=Math.random()*6+2;this.speedY=Math.random()*0.5+0.2;
+    this.speedX=(Math.random()-0.5)*0.3;this.opacity=Math.random()*0.3+0.1;
+    this.rotation=Math.random()*Math.PI*2;this.rotSpeed=(Math.random()-0.5)*0.015;
+    this.type=Math.random()<0.65?'petal':'symbol';
+    this.color=colors[Math.floor(Math.random()*colors.length)];
+    this.symbol=symbols[Math.floor(Math.random()*symbols.length)];
+    this.wobble=Math.random()*Math.PI*2;this.wobbleSpeed=Math.random()*0.015+0.004;
+  }
+  update(){
+    this.wobble+=this.wobbleSpeed;this.x+=this.speedX+Math.sin(this.wobble)*0.3;this.y+=this.speedY;
+    this.rotation+=this.rotSpeed;
+    const dx=this.x-mouse.x,dy=this.y-mouse.y,dist=Math.sqrt(dx*dx+dy*dy);
+    if(dist<70){this.x+=dx/dist*0.5;this.y+=dy/dist*0.5;}
+    if(this.y>H+30)this.reset(false);
+  }
+  draw(){
+    ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.rotation);ctx.globalAlpha=this.opacity;
+    if(this.type==='petal'){
+      ctx.fillStyle=this.color+'1)';ctx.beginPath();
+      ctx.ellipse(0,0,this.size,this.size*1.6,0,0,Math.PI*2);ctx.fill();
+    } else {
+      ctx.font=`${this.size*1.8}px serif`;ctx.fillStyle=this.color+'0.8)';
+      ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(this.symbol,0,0);
+    }
+    ctx.restore();
+  }
+}
+const particles=Array.from({length:40},()=>new P());
+function animate(){ctx.clearRect(0,0,W,H);particles.forEach(p=>{p.update();p.draw();});requestAnimationFrame(animate);}
+animate();
+</script>
+</body>
+</html>
