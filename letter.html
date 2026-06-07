@@ -6,328 +6,70 @@
 <title>CipherGiftyy — The Letter Corner</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IM+Fell+English:ital@0;1&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
 <style>
-  :root {
-    --ivory: #FAF8F5;
-    --linen: #F3EFE8;
-    --parchment: #EDE5D8;
-    --ink: #2C2523;
-    --sepia: #5C3D2E;
-    --rose: #C9847A;
-    --blush: #E8B4AD;
-    --sage: #8A9F8A;
-    --gold: #C9A96E;
-    --gold-light: #E8D5A3;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body {
-    min-height: 100vh;
-    background: var(--ivory);
-    font-family: 'Lora', serif;
-    color: var(--ink);
-    cursor: none;
-    overflow-x: hidden;
-  }
-  .cursor { width:10px;height:10px;border-radius:50%;background:var(--rose);position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply; }
-  .cursor-ring { width:30px;height:30px;border-radius:50%;border:1px solid var(--gold);position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:left 0.1s,top 0.1s; }
-  #petals-canvas { position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0; }
-
-  /* HEADER */
-  header {
-    position: relative; z-index: 10;
-    padding: 1.8rem 3rem;
-    display: flex; justify-content: space-between; align-items: center;
-    border-bottom: 1px solid rgba(201,169,110,0.2);
-  }
-  .back-home {
-    font-family: 'Lora', serif; font-style: italic;
-    font-size: 0.75rem; letter-spacing: 0.12em;
-    color: var(--gold); text-decoration: none;
-    display: flex; align-items: center; gap: 0.5rem;
-    transition: color 0.3s;
-  }
-  .back-home:hover { color: var(--sepia); }
-  .logo {
-    font-family: 'IM Fell English', serif;
-    font-size: 1.2rem; color: var(--ink);
-    display: flex; align-items: center; gap: 0.4rem;
-  }
-  .logo span { color: var(--gold); }
-  .header-tag {
-    font-family: 'Lora', serif; font-style: italic;
-    font-size: 0.7rem; color: var(--sepia);
-    letter-spacing: 0.1em;
-  }
-
-  /* SCREENS */
-  .screen { display: none; position: relative; z-index: 10; }
-  .screen.active { display: block; }
-
-  /* SCREEN 1 — Category Selection */
-  .categories-hero {
-    text-align: center;
-    padding: 3rem 2rem 2rem;
-    animation: fadeSlideUp 0.8s ease both;
-  }
-  .section-label {
-    font-family: 'Lora', serif; font-size: 0.6rem;
-    letter-spacing: 0.3em; text-transform: uppercase;
-    color: var(--gold); margin-bottom: 1rem;
-    display: flex; align-items: center; justify-content: center; gap: 1rem;
-  }
-  .section-label::before, .section-label::after {
-    content: ''; display: inline-block;
-    width: 40px; height: 1px; background: var(--gold-light);
-  }
-  .categories-title {
-    font-family: 'IM Fell English', serif;
-    font-size: 2.5rem; font-style: italic;
-    color: var(--ink); margin-bottom: 0.8rem;
-  }
-  .categories-sub {
-    font-family: 'Lora', serif; font-style: italic;
-    font-size: 0.85rem; color: var(--sepia);
-    max-width: 500px; margin: 0 auto 3rem;
-    line-height: 1.8;
-  }
-  .categories-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.2rem;
-    max-width: 900px; margin: 0 auto;
-    padding: 0 2rem 4rem;
-  }
-  .cat-card {
-    background: var(--linen);
-    border: 1px solid rgba(201,169,110,0.25);
-    border-radius: 6px;
-    padding: 1.8rem 1.5rem;
-    cursor: none;
-    transition: all 0.4s ease;
-    text-align: left;
-    animation: fadeSlideUp 0.6s ease both;
-    position: relative; overflow: hidden;
-  }
-  .cat-card::before {
-    content: '';position:absolute;inset:0;
-    background: linear-gradient(135deg, rgba(201,169,110,0.08), transparent);
-    opacity: 0; transition: opacity 0.4s;
-  }
-  .cat-card:hover { transform: translateY(-5px); box-shadow: 0 20px 50px rgba(44,37,35,0.1), 0 0 0 1px rgba(201,169,110,0.5); }
-  .cat-card:hover::before { opacity: 1; }
-  .cat-icon { font-size: 1.6rem; margin-bottom: 0.8rem; }
-  .cat-name {
-    font-family: 'IM Fell English', serif;
-    font-size: 1.1rem; font-style: italic;
-    color: var(--ink); margin-bottom: 0.4rem;
-  }
-  .cat-desc {
-    font-family: 'Lora', serif; font-style: italic;
-    font-size: 0.72rem; color: var(--sepia);
-    line-height: 1.6;
-  }
-  .cat-count {
-    margin-top: 0.8rem;
-    font-family: 'Lora', serif;
-    font-size: 0.62rem; letter-spacing: 0.15em;
-    text-transform: uppercase; color: var(--gold);
-  }
-
-  /* SCREEN 2 — Letter Selection */
-  .letters-hero {
-    text-align: center;
-    padding: 3rem 2rem 2rem;
-    animation: fadeSlideUp 0.8s ease both;
-  }
-  .letters-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 1.2rem;
-    max-width: 900px; margin: 0 auto;
-    padding: 0 2rem 4rem;
-  }
-  .letter-card {
-    background: var(--linen);
-    border: 1px solid rgba(201,169,110,0.25);
-    border-radius: 6px;
-    padding: 2rem 1.8rem;
-    cursor: none;
-    transition: all 0.4s ease;
-    animation: fadeSlideUp 0.6s ease both;
-    position: relative; overflow: hidden;
-  }
-  .letter-card::after {
-    content: '✦';
-    position: absolute; top: 1rem; right: 1rem;
-    color: var(--gold-light); font-size: 0.7rem;
-    transition: color 0.3s;
-  }
-  .letter-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(44,37,35,0.1), 0 0 0 1px rgba(201,169,110,0.4); }
-  .letter-card:hover::after { color: var(--gold); }
-  .letter-title {
-    font-family: 'IM Fell English', serif;
-    font-size: 1rem; font-style: italic;
-    color: var(--ink); margin-bottom: 0.6rem;
-    letter-spacing: 0.03em;
-  }
-  .letter-preview {
-    font-family: 'Lora', serif; font-style: italic;
-    font-size: 0.73rem; color: var(--sepia);
-    line-height: 1.7;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  /* SCREEN 3 — Letter View & Edit */
-  .letter-view {
-    max-width: 680px; margin: 0 auto;
-    padding: 3rem 2rem 5rem;
-    animation: fadeSlideUp 0.8s ease both;
-  }
-  .letter-paper {
-    background: var(--linen);
-    border: 1px solid rgba(201,169,110,0.3);
-    border-radius: 4px;
-    padding: 3.5rem 3rem;
-    position: relative;
-    box-shadow: 0 20px 60px rgba(44,37,35,0.08);
-  }
-  .letter-paper::before {
-    content: '';
-    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-    width: 60%; height: 2px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  }
-  .letter-paper-title {
-    font-family: 'IM Fell English', serif;
-    font-size: 1.4rem; font-style: italic;
-    color: var(--ink); text-align: center;
-    margin-bottom: 2rem;
-    letter-spacing: 0.05em;
-  }
-  .thin-rule {
-    width: 50%; height: 1px; margin: 1.5rem auto;
-    background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
-  }
-  .letter-textarea {
-    width: 100%;
-    min-height: 320px;
-    background: transparent;
-    border: none; outline: none;
-    resize: none;
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1rem; font-style: italic;
-    line-height: 2; color: var(--sepia);
-    cursor: text;
-  }
-  .letter-actions {
-    display: flex; gap: 1rem; justify-content: center;
-    margin-top: 2.5rem; flex-wrap: wrap;
-  }
-  .btn-primary {
-    padding: 0.8rem 2rem;
-    background: var(--ink);
-    color: var(--ivory);
-    font-family: 'Lora', serif; font-size: 0.72rem;
-    letter-spacing: 0.15em; text-transform: uppercase;
-    border: none; border-radius: 2px; cursor: none;
-    transition: all 0.3s ease;
-  }
-  .btn-primary:hover { background: var(--sepia); transform: translateY(-2px); }
-  .btn-secondary {
-    padding: 0.8rem 2rem;
-    background: transparent;
-    color: var(--sepia);
-    font-family: 'Lora', serif; font-size: 0.72rem;
-    letter-spacing: 0.15em; text-transform: uppercase;
-    border: 1px solid rgba(201,169,110,0.5); border-radius: 2px; cursor: none;
-    transition: all 0.3s ease;
-  }
-  .btn-secondary:hover { border-color: var(--gold); color: var(--ink); }
-  .edit-hint {
-    text-align: center; margin-top: 1rem;
-    font-family: 'Lora', serif; font-style: italic;
-    font-size: 0.68rem; color: var(--gold);
-    letter-spacing: 0.08em;
-  }
-
-  /* SCREEN 4 — Share Link */
-  .share-screen {
-    max-width: 500px; margin: 0 auto;
-    padding: 4rem 2rem;
-    text-align: center;
-    animation: fadeSlideUp 0.8s ease both;
-  }
-  .share-icon { font-size: 3rem; margin-bottom: 1.5rem; }
-  .share-title {
-    font-family: 'IM Fell English', serif;
-    font-size: 1.8rem; font-style: italic;
-    color: var(--ink); margin-bottom: 0.8rem;
-  }
-  .share-sub {
-    font-family: 'Lora', serif; font-style: italic;
-    font-size: 0.8rem; color: var(--sepia);
-    line-height: 1.8; margin-bottom: 2rem;
-  }
-  .share-link-box {
-    background: var(--linen);
-    border: 1px solid rgba(201,169,110,0.4);
-    border-radius: 4px;
-    padding: 1rem 1.5rem;
-    font-family: 'Lora', serif; font-size: 0.75rem;
-    color: var(--sepia); letter-spacing: 0.05em;
-    margin-bottom: 1.5rem; word-break: break-all;
-    cursor: none;
-    transition: all 0.3s;
-  }
-  .share-link-box:hover { border-color: var(--gold); }
-
-  /* NAV BREADCRUMB */
-  .breadcrumb {
-    display: flex; align-items: center; gap: 0.5rem;
-    font-family: 'Lora', serif; font-style: italic;
-    font-size: 0.68rem; color: var(--gold);
-    margin-bottom: 1.5rem; justify-content: center;
-  }
-  .breadcrumb span { color: var(--sepia); cursor: none; transition: color 0.2s; }
-  .breadcrumb span:hover { color: var(--ink); }
-  .breadcrumb-sep { color: var(--gold-light); }
-
-  /* WRITE YOUR OWN */
-  .write-own-card {
-    background: linear-gradient(135deg, var(--parchment), var(--linen));
-    border: 1px solid rgba(201,169,110,0.5);
-    border-radius: 6px;
-    padding: 2rem 1.8rem;
-    cursor: none;
-    transition: all 0.4s ease;
-    animation: fadeSlideUp 0.6s ease both;
-    text-align: center;
-    grid-column: 1 / -1;
-  }
-  .write-own-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(44,37,35,0.1); }
-
-  /* ANIMATIONS */
-  @keyframes fadeSlideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; } to { opacity: 1; }
-  }
-
-  /* RESPONSIVE */
-  @media (max-width: 600px) {
-    header { padding: 1.2rem 1.5rem; }
-    .categories-grid, .letters-grid { padding: 0 1rem 3rem; }
-    .letter-paper { padding: 2rem 1.5rem; }
-    .categories-title { font-size: 1.8rem; }
-  }
+:root{--ivory:#FAF8F5;--linen:#F3EFE8;--parchment:#EDE5D8;--ink:#2C2523;--sepia:#5C3D2E;--rose:#C9847A;--gold:#C9A96E;--gold-light:#E8D5A3;--sage:#8A9F8A;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{min-height:100vh;background:var(--ivory);font-family:'Lora',serif;color:var(--ink);cursor:none;overflow-x:hidden;}
+.cursor{width:10px;height:10px;border-radius:50%;background:var(--rose);position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply;}
+.cursor-ring{width:30px;height:30px;border-radius:50%;border:1px solid var(--gold);position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:left 0.1s,top 0.1s;}
+#petals-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+header{position:relative;z-index:10;padding:1.8rem 3rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(201,169,110,0.2);}
+.back-home{font-family:'Lora',serif;font-style:italic;font-size:0.75rem;letter-spacing:0.12em;color:var(--gold);text-decoration:none;transition:color 0.3s;}
+.back-home:hover{color:var(--sepia);}
+.logo{font-family:'IM Fell English',serif;font-size:1.2rem;color:var(--ink);}
+.logo span{color:var(--gold);}
+.header-tag{font-family:'Lora',serif;font-style:italic;font-size:0.7rem;color:var(--sepia);letter-spacing:0.1em;}
+.screen{display:none;position:relative;z-index:10;}
+.screen.active{display:block;}
+.section-label{font-family:'Lora',serif;font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;display:flex;align-items:center;justify-content:center;gap:1rem;}
+.section-label::before,.section-label::after{content:'';display:inline-block;width:40px;height:1px;background:var(--gold-light);}
+.page-hero{text-align:center;padding:3rem 2rem 2rem;animation:fadeSlideUp 0.8s ease both;}
+.page-title{font-family:'IM Fell English',serif;font-size:2.5rem;font-style:italic;color:var(--ink);margin-bottom:0.8rem;}
+.page-sub{font-family:'Lora',serif;font-style:italic;font-size:0.85rem;color:var(--sepia);max-width:500px;margin:0 auto 3rem;line-height:1.8;}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.2rem;max-width:900px;margin:0 auto;padding:0 2rem 4rem;}
+.cat-card{background:var(--linen);border:1px solid rgba(201,169,110,0.25);border-radius:6px;padding:1.8rem 1.5rem;cursor:none;transition:all 0.4s ease;animation:fadeSlideUp 0.6s ease both;position:relative;overflow:hidden;}
+.cat-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,169,110,0.08),transparent);opacity:0;transition:opacity 0.4s;}
+.cat-card:hover{transform:translateY(-5px);box-shadow:0 20px 50px rgba(44,37,35,0.1),0 0 0 1px rgba(201,169,110,0.5);}
+.cat-card:hover::before{opacity:1;}
+.cat-icon{font-size:1.6rem;margin-bottom:0.8rem;}
+.cat-name{font-family:'IM Fell English',serif;font-size:1.1rem;font-style:italic;color:var(--ink);margin-bottom:0.4rem;}
+.cat-desc{font-family:'Lora',serif;font-style:italic;font-size:0.72rem;color:var(--sepia);line-height:1.6;}
+.cat-count{margin-top:0.8rem;font-family:'Lora',serif;font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);}
+.letters-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem;max-width:900px;margin:0 auto;padding:0 2rem 4rem;}
+.letter-card{background:var(--linen);border:1px solid rgba(201,169,110,0.25);border-radius:6px;padding:2rem 1.8rem;cursor:none;transition:all 0.4s ease;animation:fadeSlideUp 0.6s ease both;position:relative;}
+.letter-card::after{content:'✦';position:absolute;top:1rem;right:1rem;color:var(--gold-light);font-size:0.7rem;transition:color 0.3s;}
+.letter-card:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(44,37,35,0.1),0 0 0 1px rgba(201,169,110,0.4);}
+.letter-card:hover::after{color:var(--gold);}
+.letter-title{font-family:'IM Fell English',serif;font-size:1rem;font-style:italic;color:var(--ink);margin-bottom:0.6rem;}
+.letter-preview{font-family:'Lora',serif;font-style:italic;font-size:0.73rem;color:var(--sepia);line-height:1.7;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.write-own-card{background:linear-gradient(135deg,var(--parchment),var(--linen));border:1px solid rgba(201,169,110,0.5);border-radius:6px;padding:2rem 1.8rem;cursor:none;transition:all 0.4s ease;animation:fadeSlideUp 0.6s ease both;text-align:center;grid-column:1/-1;}
+.write-own-card:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(44,37,35,0.1);}
+.letter-view{max-width:680px;margin:0 auto;padding:3rem 2rem 5rem;animation:fadeSlideUp 0.8s ease both;}
+.breadcrumb{display:flex;align-items:center;gap:0.5rem;font-family:'Lora',serif;font-style:italic;font-size:0.68rem;color:var(--gold);margin-bottom:1.5rem;justify-content:center;flex-wrap:wrap;}
+.breadcrumb span{color:var(--sepia);cursor:none;transition:color 0.2s;}
+.breadcrumb span:hover{color:var(--ink);}
+.breadcrumb-sep{color:var(--gold-light);}
+.letter-paper{background:var(--linen);border:1px solid rgba(201,169,110,0.3);border-radius:4px;padding:3.5rem 3rem;position:relative;box-shadow:0 20px 60px rgba(44,37,35,0.08);}
+.letter-paper::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:60%;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.letter-paper-title{font-family:'IM Fell English',serif;font-size:1.4rem;font-style:italic;color:var(--ink);text-align:center;margin-bottom:2rem;}
+.thin-rule{width:50%;height:1px;margin:1.5rem auto;background:linear-gradient(90deg,transparent,var(--gold-light),transparent);}
+.letter-textarea{width:100%;min-height:320px;background:transparent;border:none;outline:none;resize:none;font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic;line-height:2;color:var(--sepia);cursor:text;}
+.letter-actions{display:flex;gap:1rem;justify-content:center;margin-top:2.5rem;flex-wrap:wrap;}
+.btn-primary{padding:0.8rem 2rem;background:var(--ink);color:var(--ivory);font-family:'Lora',serif;font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;border:none;border-radius:2px;cursor:none;transition:all 0.3s ease;}
+.btn-primary:hover{background:var(--sepia);transform:translateY(-2px);}
+.btn-secondary{padding:0.8rem 2rem;background:transparent;color:var(--sepia);font-family:'Lora',serif;font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;border:1px solid rgba(201,169,110,0.5);border-radius:2px;cursor:none;transition:all 0.3s ease;}
+.btn-secondary:hover{border-color:var(--gold);color:var(--ink);}
+.edit-hint{text-align:center;margin-top:1rem;font-family:'Lora',serif;font-style:italic;font-size:0.68rem;color:var(--gold);letter-spacing:0.08em;}
+.share-screen{max-width:500px;margin:0 auto;padding:4rem 2rem;text-align:center;animation:fadeSlideUp 0.8s ease both;}
+.share-icon{font-size:3rem;margin-bottom:1.5rem;}
+.share-title{font-family:'IM Fell English',serif;font-size:1.8rem;font-style:italic;color:var(--ink);margin-bottom:0.8rem;}
+.share-sub{font-family:'Lora',serif;font-style:italic;font-size:0.8rem;color:var(--sepia);line-height:1.8;margin-bottom:2rem;}
+.share-link-box{background:var(--linen);border:1px solid rgba(201,169,110,0.4);border-radius:4px;padding:1rem 1.5rem;font-family:'Lora',serif;font-size:0.72rem;color:var(--sepia);margin-bottom:1.5rem;word-break:break-all;cursor:none;transition:all 0.3s;}
+.share-link-box:hover{border-color:var(--gold);}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@media(max-width:600px){header{padding:1.2rem 1.5rem;flex-direction:column;gap:0.8rem;}.cards-grid,.letters-grid{padding:0 1rem 3rem;}.letter-paper{padding:2rem 1.5rem;}.page-title{font-size:1.8rem;}}
 </style>
 </head>
 <body>
-
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursor-ring"></div>
 <canvas id="petals-canvas"></canvas>
@@ -340,93 +82,88 @@
 
 <!-- SCREEN 1: CATEGORIES -->
 <div class="screen active" id="screen-categories">
-  <div class="categories-hero">
+  <div class="page-hero">
     <div class="section-label">The Letter Corner</div>
-    <div class="categories-title">What would you like to say?</div>
-    <div class="categories-sub">
-      Choose your feeling. Every letter here was written with care,
-      and every one of them is yours to make your own.
-    </div>
+    <div class="page-title">What would you like to say?</div>
+    <div class="page-sub">Choose your feeling. Every letter was written with care, and every one is yours to make your own.</div>
   </div>
-  <div class="categories-grid">
-    <div class="cat-card" onclick="showLetters('love')" style="animation-delay:0.1s">
+  <div class="cards-grid">
+    <div class="cat-card" onclick="showLetters('love')" style="animation-delay:0.05s">
       <div class="cat-icon">🌹</div>
       <div class="cat-name">Love</div>
-      <div class="cat-desc">For the one who changed everything. Anniversary, proposal, long distance, and more.</div>
+      <div class="cat-desc">For the one who changed everything.</div>
       <div class="cat-count">12 letters</div>
     </div>
-    <div class="cat-card" onclick="showLetters('friendship')" style="animation-delay:0.15s">
+    <div class="cat-card" onclick="showLetters('friendship')" style="animation-delay:0.1s">
       <div class="cat-icon">🌸</div>
       <div class="cat-name">Friendship</div>
-      <div class="cat-desc">For the one who stayed. The one who laughed with you and held you when you cried.</div>
-      <div class="cat-count">Coming soon</div>
+      <div class="cat-desc">For the one who stayed through it all.</div>
+      <div class="cat-count">7 letters</div>
     </div>
-    <div class="cat-card" onclick="showLetters('longing')" style="animation-delay:0.2s">
+    <div class="cat-card" onclick="showLetters('longing')" style="animation-delay:0.15s">
       <div class="cat-icon">🌙</div>
       <div class="cat-name">Longing & Missing</div>
-      <div class="cat-desc">For the ones far away. Distance is just a word when the feeling is this strong.</div>
-      <div class="cat-count">Coming soon</div>
+      <div class="cat-desc">For the ones far away.</div>
+      <div class="cat-count">8 letters</div>
     </div>
-    <div class="cat-card" onclick="showLetters('gratitude')" style="animation-delay:0.25s">
+    <div class="cat-card" onclick="showLetters('gratitude')" style="animation-delay:0.2s">
       <div class="cat-icon">🌿</div>
       <div class="cat-name">Gratitude</div>
-      <div class="cat-desc">For the ones who gave without asking. A thank you that means more than words.</div>
-      <div class="cat-count">Coming soon</div>
+      <div class="cat-desc">For the ones who gave without asking.</div>
+      <div class="cat-count">8 letters</div>
     </div>
-    <div class="cat-card" onclick="showLetters('apology')" style="animation-delay:0.3s">
+    <div class="cat-card" onclick="showLetters('apology')" style="animation-delay:0.25s">
       <div class="cat-icon">🕊️</div>
       <div class="cat-name">Apology</div>
-      <div class="cat-desc">For when sorry is not enough but you say it anyway, with your whole heart.</div>
-      <div class="cat-count">Coming soon</div>
+      <div class="cat-desc">For when sorry is not enough, but you say it anyway.</div>
+      <div class="cat-count">8 letters</div>
     </div>
-    <div class="cat-card" onclick="showLetters('family')" style="animation-delay:0.35s">
+    <div class="cat-card" onclick="showLetters('family')" style="animation-delay:0.3s">
       <div class="cat-icon">🏡</div>
       <div class="cat-name">Family</div>
-      <div class="cat-desc">For the ones you were given before you could choose. The roots that hold you.</div>
-      <div class="cat-count">Coming soon</div>
+      <div class="cat-desc">For the roots that hold you.</div>
+      <div class="cat-count">10 letters</div>
     </div>
-    <div class="cat-card" onclick="showLetters('yourself')" style="animation-delay:0.4s">
+    <div class="cat-card" onclick="showLetters('yourself')" style="animation-delay:0.35s">
       <div class="cat-icon">🪞</div>
       <div class="cat-name">Letter for Yourself</div>
-      <div class="cat-desc">Because you deserve words of kindness too. A letter from you, to you.</div>
-      <div class="cat-count">Coming soon</div>
+      <div class="cat-desc">Because you deserve kindness too.</div>
+      <div class="cat-count">8 letters</div>
     </div>
-    <div class="cat-card" onclick="showLetters('goodbye')" style="animation-delay:0.45s">
+    <div class="cat-card" onclick="showLetters('goodbye')" style="animation-delay:0.4s">
       <div class="cat-icon">🍂</div>
       <div class="cat-name">Goodbye</div>
-      <div class="cat-desc">For the endings that deserve a proper farewell. Honest, gentle, and real.</div>
-      <div class="cat-count">Coming soon</div>
+      <div class="cat-desc">For endings that deserve a proper farewell.</div>
+      <div class="cat-count">12 letters</div>
     </div>
-    <div class="cat-card" onclick="showLetters('seasonal')" style="animation-delay:0.5s">
+    <div class="cat-card" onclick="showLetters('seasonal')" style="animation-delay:0.45s">
       <div class="cat-icon">❄️</div>
       <div class="cat-name">Seasonal</div>
-      <div class="cat-desc">For birthdays, holidays, new years, and every season that brings you to mind.</div>
-      <div class="cat-count">Coming soon</div>
+      <div class="cat-desc">For birthdays, Eid, Diwali, anniversaries and every season.</div>
+      <div class="cat-count">13 letters</div>
     </div>
-    <div class="cat-card" onclick="showLetters('timecapsule')" style="animation-delay:0.55s">
+    <div class="cat-card" onclick="showLetters('timecapsule')" style="animation-delay:0.5s">
       <div class="cat-icon">⏳</div>
       <div class="cat-name">Time Capsule</div>
-      <div class="cat-desc">A letter sealed for the future. Open it in a year. Open it when you need it most.</div>
-      <div class="cat-count">Coming soon</div>
+      <div class="cat-desc">Open when sad, angry, happy, or five years from now.</div>
+      <div class="cat-count">13 letters</div>
     </div>
   </div>
 </div>
 
 <!-- SCREEN 2: LETTERS LIST -->
 <div class="screen" id="screen-letters">
-  <div class="letters-hero">
+  <div class="page-hero">
     <div class="breadcrumb">
       <span onclick="showCategories()">Letters</span>
       <span class="breadcrumb-sep">✦</span>
       <span id="current-cat-name">Love</span>
     </div>
     <div class="section-label">Choose your letter</div>
-    <div class="categories-title" id="letters-title">Letters of Love</div>
-    <div class="categories-sub">Every letter is editable. Make it yours.</div>
+    <div class="page-title" id="letters-title">Letters of Love</div>
+    <div class="page-sub">Every letter is editable. Make it yours.</div>
   </div>
-  <div class="letters-grid" id="letters-grid">
-    <!-- filled by JS -->
-  </div>
+  <div class="letters-grid" id="letters-grid"></div>
 </div>
 
 <!-- SCREEN 3: LETTER VIEW -->
@@ -437,15 +174,15 @@
       <span class="breadcrumb-sep">✦</span>
       <span onclick="goBackToLetters()" id="view-cat-name">Love</span>
       <span class="breadcrumb-sep">✦</span>
-      <span id="view-letter-name">One More Forever</span>
+      <span id="view-letter-name">Letter</span>
     </div>
     <div class="letter-paper">
-      <div class="letter-paper-title" id="view-title">ONE MORE FOREVER</div>
+      <div class="letter-paper-title" id="view-title"></div>
       <div class="thin-rule"></div>
       <textarea class="letter-textarea" id="letter-textarea" spellcheck="false"></textarea>
       <div class="thin-rule"></div>
     </div>
-    <div class="edit-hint">✦ &nbsp; This letter is yours to edit. Tap anywhere inside to make it personal. &nbsp; ✦</div>
+    <div class="edit-hint">✦ &nbsp;This letter is yours to edit. Tap inside to make it personal.&nbsp; ✦</div>
     <div class="letter-actions">
       <button class="btn-primary" onclick="generateLink()">Create My Gift Link ✦</button>
       <button class="btn-secondary" onclick="goBackToLetters()">Choose Another</button>
@@ -467,10 +204,10 @@
       <textarea class="letter-textarea" id="own-textarea" spellcheck="false" placeholder="Dear someone special,&#10;&#10;Begin here..."></textarea>
       <div class="thin-rule"></div>
     </div>
-    <div class="edit-hint">✦ &nbsp; Write from your heart. Every word matters. &nbsp; ✦</div>
+    <div class="edit-hint">✦ &nbsp;Write from your heart. Every word matters.&nbsp; ✦</div>
     <div class="letter-actions">
       <button class="btn-primary" onclick="generateOwnLink()">Create My Gift Link ✦</button>
-      <button class="btn-secondary" onclick="showCategories()">Go Back</button>
+      <button class="btn-secondary" onclick="goBackToLetters()">Go Back</button>
     </div>
   </div>
 </div>
@@ -480,474 +217,243 @@
   <div class="share-screen">
     <div class="share-icon">🌸</div>
     <div class="share-title">Your letter is ready.</div>
-    <div class="share-sub">
-      Copy this link and send it to your beloved.<br/>
-      When they open it, they will find your words waiting for them —<br/>
-      like a letter that travelled through a garden to reach them.
-    </div>
-    <div class="share-link-box" id="share-link-display" onclick="copyLink()">
-      Click to copy your gift link ✦
-    </div>
+    <div class="share-sub">Copy this link and send it to your beloved.<br/>When they open it, your words will be waiting — like a letter that travelled through a garden.</div>
+    <div class="share-link-box" id="share-link-display" onclick="copyLink()">Click to copy your gift link ✦</div>
     <div class="letter-actions">
       <button class="btn-primary" onclick="copyLink()">Copy Link ✦</button>
       <button class="btn-secondary" onclick="showCategories()">Make Another</button>
     </div>
-    <div class="edit-hint" id="copy-confirm" style="display:none; color: var(--sage);">✦ &nbsp; Copied! Now send it with love. &nbsp; ✦</div>
+    <div class="edit-hint" id="copy-confirm" style="display:none;color:var(--sage);">✦ &nbsp;Copied! Now send it with love.&nbsp; ✦</div>
   </div>
 </div>
 
 <script>
-// Cursor
-const cursor = document.getElementById('cursor');
-const ring = document.getElementById('cursor-ring');
-document.addEventListener('mousemove', e => {
-  cursor.style.left = e.clientX + 'px';
-  cursor.style.top = e.clientY + 'px';
-  setTimeout(() => {
-    ring.style.left = e.clientX + 'px';
-    ring.style.top = e.clientY + 'px';
-  }, 80);
-});
+const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+document.addEventListener('mousemove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px';setTimeout(()=>{ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px';},80);});
 
-// Letters data — your real Notion writing
-const lettersData = {
-  love: {
-    title: 'Letters of Love',
-    letters: [
-      {
-        id: 'one-more-forever',
-        title: 'One More Forever',
-        preview: 'Another year. Another chapter. And somehow I still find new reasons to choose you...',
-        content: `My Love,
-
-Another year.
-Another chapter.
-And somehow I still find new reasons to choose you.
-
-Thank you for the laughter we shared.
-Thank you for the difficult days we survived.
-Thank you for staying through versions of me
-that were still learning who they were.
-
-I cannot promise perfection.
-I cannot promise a life without storms.
-But I can promise this:
-
-If tomorrow asks me again,
-I will choose you again.
-And if the day after asks the same question,
-I will give the same answer.
-
-Happy Anniversary.
-
-Forever,
-Yours`
-      },
-      {
-        id: 'the-day-i-met-you',
-        title: 'The Day I Met You',
-        preview: 'I did not know that day would matter. It looked ordinary. The sky was ordinary...',
-        content: `Dear You,
-
-I did not know that day would matter.
-It looked ordinary.
-The sky was ordinary.
-The hours were ordinary.
-You were not.
-
-Looking back now,
-I realize that some people enter your life quietly.
-No thunder.
-No fireworks.
-Just a conversation.
-A smile.
-A moment.
-
-And then somehow they become part of your story.
-
-Meeting you felt small at the time.
-Now it feels like one of my favorite memories.
-
-With gratitude,
-Me`
-      },
-      {
-        id: 'love-letter',
-        title: 'Love Letter',
-        preview: 'If someone asked me what changed after you entered my life, I would struggle to answer...',
-        content: `My Love,
-
-If someone asked me what changed after you entered my life,
-I would struggle to answer.
-Not because nothing changed.
-Because too much did.
-
-The days became brighter.
-The future became easier to imagine.
-The smallest moments gained meaning.
-
-You did not rescue me.
-You did not complete me.
-You simply stood beside me.
-
-And somehow that was enough
-to make everything feel lighter.
-
-Thank you for being here.
-
-Yours,
-Always`
-      },
-      {
-        id: 'long-distance-love',
-        title: 'Long Distance Love',
-        preview: 'Distance is a strange thing. It teaches patience. It teaches trust...',
-        content: `My Love,
-
-Distance is a strange thing.
-It teaches patience.
-It teaches trust.
-It teaches how much affection can fit
-inside a simple message.
-
-Some days I wish I could hold your hand.
-Some days I wish I could simply sit beside you in silence.
-
-But until that day arrives,
-I will continue collecting memories for us.
-
-One day the distance will become a story.
-And we will laugh about how far apart we once were.
-
-Waiting for that day,
-Yours`
-      },
-      {
-        id: 'just-because-you-matter',
-        title: 'Just Because You Matter',
-        preview: 'No occasion. No reason. Just this — the quiet knowledge that you matter more than words can hold...',
-        content: `Dear You,
-
-No occasion.
-No reason.
-No anniversary or birthday or celebration.
-
-Just this —
-the quiet knowledge that you matter,
-more than words can hold,
-more than gestures can carry,
-more than I usually say out loud.
-
-I wanted you to know.
-That is all.
-That is everything.
-
-With love,
-Me`
-      },
-      {
-        id: 'i-adore-you',
-        title: '🌷 I Adore You',
-        preview: 'It is the small things. The way you laugh. The way you exist so effortlessly...',
-        content: `My Beloved,
-
-It is the small things.
-
-The way you laugh
-when you think something is funnier than it is.
-The way you exist so effortlessly
-in a world that asks everyone to try so hard.
-
-I adore you.
-Not dramatically.
-Not desperately.
-Just — deeply, quietly, and without condition.
-
-You are one of my favorite things
-about being alive.
-
-Always,
-Yours`
-      },
-      {
-        id: 'for-my-beloved',
-        title: 'For My Beloved',
-        preview: 'Before you, I did not know that love could be this quiet. This steady...',
-        content: `For My Beloved,
-
-Before you,
-I did not know that love could be this quiet.
-This steady.
-This safe.
-
-You taught me that love does not have to be loud
-to be real.
-That it can live in small moments —
-in a shared glance,
-in a cup of tea made without asking,
-in someone simply staying.
-
-Thank you for staying.
-
-Yours,
-Always and always`
-      },
-      {
-        id: 'thinking-of-you',
-        title: 'Thinking of You',
-        preview: 'I was not going to say anything. But then I thought — why not? Why keep it to myself...',
-        content: `Dear You,
-
-I was not going to say anything.
-But then I thought — why not?
-Why keep it to myself
-when the whole point of feeling something
-is to let the other person know?
-
-I have been thinking of you.
-Not for any particular reason.
-Just because you tend to appear in my thoughts
-uninvited and entirely welcome.
-
-That is all.
-Just — thinking of you.
-
-With warmth,
-Me`
-      },
-      {
-        id: 'i-miss-you',
-        title: 'I Miss You',
-        preview: 'Missing someone is a strange kind of fullness. You are absent and yet somehow everywhere...',
-        content: `Dear You,
-
-Missing someone is a strange kind of fullness.
-
-You are absent
-and yet somehow everywhere.
-In songs that play without warning.
-In places we have never even been together.
-In the quiet of an ordinary afternoon.
-
-I miss you.
-Not dramatically.
-Just honestly.
-
-Come back soon,
-or simply know that I am thinking of you.
-
-Yours,
-Me`
-      },
-      {
-        id: 'proposal-letter',
-        title: 'Proposal Letter',
-        preview: 'I have rehearsed this a hundred times and somehow it still feels impossible to begin...',
-        content: `My Love,
-
-I have rehearsed this a hundred times
-and somehow it still feels impossible to begin.
-
-So I will simply say it.
-
-I want to choose you.
-Every morning.
-Every difficult Tuesday.
-Every ordinary evening.
-Every version of a future I have not yet imagined.
-
-I want to figure it all out with you.
-I want to grow old beside you.
-I want to say, years from now,
-that the best decision I ever made
-was asking you this question.
-
-Will you?
-
-With my whole heart,
-Yours`
-      },
-      {
-        id: 'just-because-i-love-you',
-        title: 'Just Because I Love You',
-        preview: 'There is no occasion. I simply love you. And I realized I do not say it enough...',
-        content: `My Love,
-
-There is no occasion.
-
-I simply love you.
-And I realized I do not say it enough —
-not because I do not feel it,
-but because I assume you already know.
-
-You should not have to assume.
-You should hear it.
-
-I love you.
-Just because.
-Always because.
-
-Yours,
-Forever`
-      },
-      {
-        id: 'first-bloom',
-        title: 'First Bloom',
-        preview: 'This is new to me. Loving someone this openly. Saying it without rehearsing...',
-        content: `Dear You,
-
-This is new to me.
-Loving someone this openly.
-Saying it without rehearsing.
-Feeling it without apologizing.
-
-You make it easy.
-Or maybe you make me brave.
-I cannot always tell the difference.
-
-But I know this —
-whatever this is,
-I do not want it to stop.
-
-Yours,
-Someone who is still figuring this out`
-      },
+const lettersData={
+  love:{
+    title:'Letters of Love',
+    letters:[
+      {id:'one-more-forever',title:'One More Forever',preview:'Another year. Another chapter. And somehow I still find new reasons to choose you...',content:`My Love,\n\nAnother year.\nAnother chapter.\nAnd somehow I still find new reasons to choose you.\n\nThank you for the laughter we shared.\nThank you for the difficult days we survived.\nThank you for staying through versions of me\nthat were still learning who they were.\n\nI cannot promise perfection.\nI cannot promise a life without storms.\nBut I can promise this:\n\nIf tomorrow asks me again,\nI will choose you again.\n\nHappy Anniversary.\n\nForever,\nYours`},
+      {id:'day-i-met-you',title:'The Day I Met You',preview:'I did not know that day would matter. It looked ordinary. The sky was ordinary...',content:`Dear You,\n\nI did not know that day would matter.\nIt looked ordinary.\nThe sky was ordinary.\nThe hours were ordinary.\nYou were not.\n\nLooking back now,\nI realize that some people enter your life quietly.\nNo thunder.\nNo fireworks.\nJust a conversation.\nA smile.\nA moment.\n\nAnd then somehow they become part of your story.\n\nMeeting you felt small at the time.\nNow it feels like one of my favorite memories.\n\nWith gratitude,\nMe`},
+      {id:'love-letter',title:'Love Letter',preview:'If someone asked me what changed after you entered my life, I would struggle to answer...',content:`My Love,\n\nIf someone asked me what changed after you entered my life,\nI would struggle to answer.\nNot because nothing changed.\nBecause too much did.\n\nThe days became brighter.\nThe future became easier to imagine.\nThe smallest moments gained meaning.\n\nYou did not rescue me.\nYou did not complete me.\nYou simply stood beside me.\n\nAnd somehow that was enough\nto make everything feel lighter.\n\nThank you for being here.\n\nYours,\nAlways`},
+      {id:'long-distance',title:'Long Distance Love',preview:'Distance is a strange thing. It teaches patience. It teaches trust...',content:`My Love,\n\nDistance is a strange thing.\nIt teaches patience.\nIt teaches trust.\nIt teaches how much affection can fit\ninside a simple message.\n\nSome days I wish I could hold your hand.\nSome days I wish I could simply sit beside you in silence.\n\nBut until that day arrives,\nI will continue collecting memories for us.\n\nOne day the distance will become a story.\nAnd we will laugh about how far apart we once were.\n\nWaiting for that day,\nYours`},
+      {id:'just-because-you-matter',title:'Just Because You Matter',preview:'No occasion. No reason. Just this — the quiet knowledge that you matter...',content:`Dear You,\n\nNo occasion.\nNo reason.\nNo anniversary or birthday.\n\nJust this —\nthe quiet knowledge that you matter,\nmore than words can hold,\nmore than gestures can carry,\nmore than I usually say out loud.\n\nI wanted you to know.\nThat is all.\nThat is everything.\n\nWith love,\nMe`},
+      {id:'i-adore-you',title:'🌷 I Adore You',preview:'It is the small things. The way you laugh. The way you exist so effortlessly...',content:`My Beloved,\n\nIt is the small things.\n\nThe way you laugh\nwhen you think something is funnier than it is.\nThe way you exist so effortlessly\nin a world that asks everyone to try so hard.\n\nI adore you.\nNot dramatically.\nNot desperately.\nJust — deeply, quietly, and without condition.\n\nYou are one of my favorite things\nabout being alive.\n\nAlways,\nYours`},
+      {id:'for-my-beloved',title:'For My Beloved',preview:'Before you, I did not know that love could be this quiet. This steady...',content:`For My Beloved,\n\nBefore you,\nI did not know that love could be this quiet.\nThis steady.\nThis safe.\n\nYou taught me that love does not have to be loud\nto be real.\n\nThank you for staying.\n\nYours,\nAlways and always`},
+      {id:'thinking-of-you',title:'Thinking of You',preview:'I was not going to say anything. But then I thought — why not?...',content:`Dear You,\n\nI was not going to say anything.\nBut then I thought — why not?\nWhy keep it to myself\nwhen the whole point of feeling something\nis to let the other person know?\n\nI have been thinking of you.\nNot for any particular reason.\nJust because you tend to appear in my thoughts\nuninvited and entirely welcome.\n\nWith warmth,\nMe`},
+      {id:'i-miss-you',title:'I Miss You',preview:'Missing someone is a strange kind of fullness. You are absent and yet somehow everywhere...',content:`Dear You,\n\nMissing someone is a strange kind of fullness.\n\nYou are absent\nand yet somehow everywhere.\nIn songs that play without warning.\nIn places we have never even been together.\nIn the quiet of an ordinary afternoon.\n\nI miss you.\nNot dramatically.\nJust honestly.\n\nYours,\nMe`},
+      {id:'proposal',title:'Proposal Letter',preview:'I have rehearsed this a hundred times and somehow it still feels impossible to begin...',content:`My Love,\n\nI have rehearsed this a hundred times\nand somehow it still feels impossible to begin.\n\nSo I will simply say it.\n\nI want to choose you.\nEvery morning.\nEvery difficult Tuesday.\nEvery ordinary evening.\n\nI want to figure it all out with you.\nI want to grow old beside you.\n\nWill you?\n\nWith my whole heart,\nYours`},
+      {id:'just-because-i-love-you',title:'Just Because I Love You',preview:'There is no occasion. I simply love you. And I realized I do not say it enough...',content:`My Love,\n\nThere is no occasion.\n\nI simply love you.\nAnd I realized I do not say it enough.\n\nI love you.\nJust because.\nAlways because.\n\nYours,\nForever`},
+      {id:'first-bloom',title:'First Bloom',preview:'This is new to me. Loving someone this openly. Saying it without rehearsing...',content:`Dear You,\n\nThis is new to me.\nLoving someone this openly.\nSaying it without rehearsing.\nFeeling it without apologizing.\n\nYou make it easy.\nOr maybe you make me brave.\nI cannot always tell the difference.\n\nBut I know this —\nwhatever this is,\nI do not want it to stop.\n\nYours,\nSomeone who is still figuring this out`}
+    ]
+  },
+  friendship:{
+    title:'Letters of Friendship',
+    letters:[
+      {id:'best-friend',title:'To My Best Friend',preview:'I do not think I say this enough. Life would have been much harder without you...',content:`Dear Best Friend,\n\nI do not think I say this enough.\n\nLife would have been much harder without you.\n\nThank you for listening to stories you had already heard.\nThank you for staying through versions of me that I was still trying to understand myself.\nThank you for every laugh, every conversation, and every moment when you quietly reminded me that I was not alone.\n\nIf I had to choose one thing to keep from all these years,\nI would choose the memories we created together.\n\nYour friend,\nAlways`},
+      {id:'favorite-disaster',title:'To My Favorite Disaster',preview:'I am convinced that peace follows you only because chaos gets tired first...',content:`Dear Disaster,\n\nI am convinced that peace follows you only because chaos gets tired first.\n\nYou have turned simple plans into adventures, ordinary conversations into comedy shows, and normal days into stories that should probably never be repeated publicly.\n\nYet somehow, I would not change a thing.\n\nBecause hidden beneath all your nonsense is one of the most loyal hearts I know.\n\nYou are exhausting.\nYou are ridiculous.\nYou are impossible.\nAnd somehow, you are also one of my favorite people.\n\nPlease never become normal.\n\nWith concern and affection,\nYour exhausted friend`},
+      {id:'thank-you-staying',title:'Thank You For Staying',preview:'People talk a lot about those who arrive. I think more about those who stay...',content:`Dear Friend,\n\nPeople talk a lot about those who arrive.\nI think more about those who stay.\n\nThank you for staying when life became difficult.\nThank you for staying when I was not particularly fun to be around.\nThank you for staying when disappearing would have been easier.\n\nLoyalty is not measured during good days.\nIt is measured during storms.\n\nAnd you remained.\n\nGrateful for you,\nAlways`},
+      {id:'my-listener',title:'My Listener',preview:'Thank you for listening. Not the polite kind of listening. The real kind...',content:`Dear Friend,\n\nThank you for listening.\nNot the polite kind of listening.\nThe real kind.\nThe kind where you remembered details.\nThe kind where you noticed what I was trying not to say.\nThe kind where you stayed present even when my thoughts were messy.\n\nBeing understood is one of the rarest feelings in the world.\nAnd you gave me that feeling more times than I can count.\n\nWith gratitude,\nMe`},
+      {id:'grew-up-together',title:'We Grew Up Together',preview:'When I look back at old memories, I notice something. You are standing in many of them...',content:`Dear Friend,\n\nWhen I look back at old memories, I notice something.\nYou are standing in many of them.\n\nThrough awkward years.\nThrough mistakes.\nThrough victories.\nThrough versions of ourselves that barely resemble who we are now.\n\nWe changed.\nThe world changed.\nLife changed.\nYet somehow, our friendship survived all of it.\n\nThank you for growing up beside me.\n\nYour old friend,\nForever`},
+      {id:'friend-became-home',title:'The Friend Who Became Home',preview:'Home is a strange word. For me, it became a person...',content:`Dear Friend,\n\nHome is a strange word.\nFor some people it is a building.\nFor me, it became a person.\n\nSomewhere between conversations, laughter, and shared memories,\nyou stopped feeling like a friend I knew.\nYou started feeling like a place I could return to.\nA place where I did not have to pretend.\nA place where I could simply exist.\n\nThank you for becoming that.\n\nYours,\nComfortably`},
+      {id:'you-made-life-easier',title:'You Made Life Easier',preview:'You never solved all my problems. Yet somehow, life became easier because you were there...',content:`Dear Friend,\n\nYou never solved all my problems.\nYou never magically fixed everything.\nYet somehow, life became easier because you were there.\n\nA difficult day felt lighter after talking to you.\nA good day felt better when I shared it with you.\nA boring day became memorable because you were part of it.\n\nThat is a rare gift.\n\nThank you for making life easier simply by existing inside it.\n\nWith appreciation,\nYour friend`}
+    ]
+  },
+  longing:{
+    title:'Letters of Longing & Missing',
+    letters:[
+      {id:'i-miss-you-longing',title:'I Miss You',preview:'I miss you in the smallest moments. Not during storms. Not during tragedies...',content:`Dear You,\n\nI miss you in the smallest moments.\nNot during storms.\nNot during tragedies.\nI miss you when something funny happens and my first instinct is to tell you.\nI miss you when I hear a song you would have loved.\nI miss you when I see a sunset and wonder whether the sky looks the same where you are.\n\nMaybe missing someone is not sadness.\nMaybe it is proof that they mattered.\n\nAnd if that is true,\nthen you mattered more than I ever managed to say.\n\nMissing you,\nAlways a little`},
+      {id:'thinking-of-you-longing',title:'Thinking Of You',preview:'You appeared in my thoughts again today. No reason. No special memory...',content:`Dear You,\n\nYou appeared in my thoughts again today.\nNo reason.\nNo special memory.\nNo dramatic trigger.\nJust your name quietly walking through my mind as if it still belongs there.\n\nI wonder how you're doing.\nI wonder what makes you laugh these days.\nI wonder if life has been gentle with you.\n\nSome people leave our lives.\nOthers stay hidden in ordinary thoughts forever.\nYou belong to the second kind.\n\nThinking of you,\nMore often than you'd guess`},
+      {id:'long-distance-longing',title:'Long Distance Love',preview:'Distance is strange. It cannot stop me from loving you...',content:`My Love,\n\nDistance is strange.\nIt cannot stop me from loving you.\nYet it somehow stops me from sitting beside you when you've had a difficult day.\n\nI cannot hold your hand.\nI cannot steal your fries.\nI cannot hear your laugh without a screen standing between us.\n\nBut somehow,\nevery message becomes precious.\nEvery call becomes an event.\n\nI do not count the miles between us.\nI count the moments until they disappear.\n\nForever yours,\nAcross every distance`},
+      {id:'silence-after-you',title:'The Silence After You',preview:'Nobody talks about the silence. Everyone talks about leaving...',content:`Dear You,\n\nNobody talks about the silence.\nEveryone talks about leaving.\nNobody talks about what remains afterward.\n\nThe silence where a notification should have appeared.\nThe silence where a conversation used to live.\nThe silence that slowly learns your shape.\n\nAt first, I hated it.\nThen I feared it.\nNow I simply sit beside it.\n\nBecause every silence carries an echo.\nAnd yours never fully left.\n\nYours,\nThe one who remembers the melody`},
+      {id:'still-look-for-you',title:'I Still Look For You',preview:'This is embarrassing to admit. But sometimes I still look for you...',content:`Dear You,\n\nThis is embarrassing to admit.\nBut sometimes I still look for you.\nIn crowded places.\nIn familiar usernames.\nIn voices that almost sound like yours.\n\nIt never lasts more than a second.\nJust enough time for my heart to forget reality.\n\nThen I remember.\nAnd life continues.\n\nBut those tiny moments reveal something beautiful —\nmy mind still recognizes you as someone important.\n\nStill looking sometimes,\nMe`},
+      {id:'things-i-never-said',title:'The Things I Never Said',preview:'There are conversations that never happened. Words that stayed trapped behind pride...',content:`Dear You,\n\nThere are conversations that never happened.\nWords that stayed trapped behind pride.\nConfessions delayed until they became useless.\n\nI thought there would always be more time.\nAnother evening.\nAnother chance.\n\nLife had different plans.\n\nSo if this letter reaches you somehow,\nknow this:\nYou mattered more than my silence ever allowed you to understand.\n\nWith honesty at last,\nMe`},
+      {id:'if-you-were-here',title:'If You Were Here',preview:'If you were here, nothing extraordinary would happen. We would probably talk about nonsense...',content:`Dear You,\n\nIf you were here,\nnothing extraordinary would happen.\nWe would probably talk about nonsense.\nComplain about life.\nShare a meal.\nLaugh at something completely ridiculous.\n\nAnd somehow,\nthat would be enough.\n\nBecause I do not miss grand adventures.\nI miss ordinary moments with the right person.\n\nWaiting for that day,\nMe`},
+      {id:'until-we-meet-again',title:'Until We Meet Again',preview:'I do not know when we will meet again. Life rarely shares its plans...',content:`Dear You,\n\nI don't know when we will meet again.\nLife rarely shares its plans.\n\nMaybe soon.\nMaybe much later.\nMaybe after we have both changed into people neither of us can currently imagine.\n\nBut if that day arrives,\nI hope we recognize each other.\nNot by appearance.\nNot by voice.\nBut by the feeling.\n\nThe strange comfort that says,\n"I know this soul."\n\nUntil we meet again,\nSomeone who still believes we will`}
+    ]
+  },
+  gratitude:{
+    title:'Letters of Gratitude',
+    letters:[
+      {id:'thank-you-for-staying',title:'Thank You For Staying',preview:'Thank you for staying. Not when I was easy to love. Not when I was funny or confident...',content:`Dear You,\n\nThank you for staying.\nNot when I was easy to love.\nNot when I was funny, confident, or full of stories.\nThank you for staying when I became difficult.\n\nYou never arrived with solutions.\nYou arrived with presence.\nAnd sometimes that was worth more.\n\nThank you for being one of those people.\n\nWith gratitude,\nMe`},
+      {id:'to-my-teacher',title:'To My Teacher',preview:'You probably don\'t remember every lesson you taught. But I remember some of them...',content:`Dear Teacher,\n\nYou probably don't remember every lesson you taught.\nBut I remember some of them.\n\nNot the chapters.\nNot the equations.\nI remember the moments when you believed I could do something\nbefore I believed it myself.\n\nKnowledge fades.\nConfidence stays.\n\nThank you for teaching more than subjects.\nThank you for teaching possibility.\n\nWith respect,\nA student who remembers`},
+      {id:'to-my-mother-gratitude',title:'To My Mother',preview:'There are many things I understand now that I couldn\'t understand before. The tiredness...',content:`Dear Mother,\n\nThere are many things I understand now that I couldn't understand before.\nThe tiredness.\nThe sacrifices.\nThe invisible work nobody notices.\n\nThank you for every meal.\nEvery worry.\nEvery sleepless night.\nEvery act of care that looked ordinary but wasn't.\n\nThank you for loving me in the only way you knew how.\n\nWith love,\nYour child`},
+      {id:'to-my-father-gratitude',title:'To My Father',preview:'There are things children notice but rarely say. The long hours. The responsibilities...',content:`Dear Father,\n\nThere are things children notice but rarely say.\nThe long hours.\nThe responsibilities.\nThe silent burdens carried without applause.\n\nAs a child, I only saw the results.\nNow I see the effort behind them.\n\nThank you for every sacrifice I never noticed.\nAnd every problem you solved before it reached me.\n\nWith appreciation,\nYour child`},
+      {id:'to-my-sibling-gratitude',title:'To My Sibling',preview:'Nobody prepares us for growing up together. One day we\'re fighting over nonsense...',content:`Dear Sibling,\n\nNobody prepares us for growing up together.\nOne day we're fighting over nonsense.\nThe next day we're sharing memories nobody else understands.\n\nYou have seen every version of me.\nThe annoying one.\nThe dramatic one.\nThe broken one.\nAnd somehow you're still here.\n\nThank you for being proof that family can also be friendship.\n\nWith affection,\nYour forever teammate`},
+      {id:'person-who-helped',title:'To The Person Who Helped Me',preview:'I don\'t know if you realize what you did. Maybe it was a conversation...',content:`Dear You,\n\nI don't know if you realize what you did.\nMaybe it was a conversation.\nMaybe a small kindness.\nMaybe a sentence you forgot the next day.\n\nBut something you did changed my direction.\n\nThank you for helping me when I needed it most.\nEven if you never knew.\n\nGratefully,\nSomeone you helped`},
+      {id:'small-things',title:'For The Small Things',preview:'Thank you for the small things. The messages. The check-ins. The random jokes...',content:`Dear You,\n\nThank you for the small things.\nThe messages.\nThe check-ins.\nThe random jokes.\nThe tiny acts of kindness people usually overlook.\n\nSmall kindness repeated consistently can change a life.\n\nThank you for every moment you probably considered insignificant.\nBecause they weren't.\nNot to me.\n\nWith gratitude,\nMe`},
+      {id:'you-changed-my-life',title:'You Changed My Life',preview:'This sounds dramatic. But it is true. You changed my life...',content:`Dear You,\n\nThis sounds dramatic.\nBut it is true.\n\nYou changed my life.\nNot in one spectacular moment.\nNot through a grand speech.\nYou changed it gradually.\nConversation by conversation.\nDay by day.\n\nSome people enter our lives and leave footprints.\nOthers leave entire roads.\n\nYou left a road.\nAnd I am still walking on it.\n\nForever grateful,\nMe`}
+    ]
+  },
+  apology:{
+    title:'Letters of Apology',
+    letters:[
+      {id:'im-sorry',title:"I'm Sorry",preview:"I'm sorry. Not the quick apology people throw around to end a conversation...",content:`Dear You,\n\nI'm sorry.\nNot the quick apology people throw around to end a conversation.\nNot the apology that secretly expects forgiveness.\nA real one.\n\nI know I hurt you.\nMaybe through words.\nMaybe through silence.\nMaybe through things I failed to do.\n\nAt the time, I had reasons.\nNow I have perspective.\nAnd perspective is a cruel teacher.\n\nYou deserved better.\nAnd for that, I am deeply sorry.\n\nWith sincerity,\nMe`},
+      {id:'apology-i-owe',title:'The Apology I Owe You',preview:'This apology has been waiting for me longer than I would like to admit...',content:`Dear You,\n\nThis apology has been waiting for me longer than I would like to admit.\n\nI owe you honesty.\nI owe you accountability.\nI owe you acknowledgment.\n\nYou deserved explanations.\nInstead, I gave confusion.\nYou deserved communication.\nInstead, I gave distance.\n\nYou were not imagining the hurt.\nYou were not overreacting.\nAnd you deserved better.\n\nI am sorry it took me this long to say so.\n\nRespectfully,\nMe`},
+      {id:'i-was-wrong',title:'I Was Wrong',preview:'I was wrong. There is no elegant way to decorate that sentence...',content:`Dear You,\n\nI was wrong.\nThere is no elegant way to decorate that sentence.\nNo excuse strong enough.\n\nI thought being hurt justified hurting others.\nIt didn't.\n\nTime simply showed me the truth.\nAnd the truth is simple.\nYou deserved fairness.\nI failed to give it.\n\nFor that,\nI am sorry.\n\nWith humility,\nMe`},
+      {id:'i-hurt-you',title:'I Hurt You',preview:'One of the hardest things in life is realizing you became someone\'s painful memory...',content:`Dear You,\n\nOne of the hardest things in life is realizing you became someone's painful memory.\nNot intentionally.\nNot maliciously.\nBut still.\n\nI hurt you.\nAnd intentions do not erase consequences.\nPain does not disappear simply because it was accidental.\n\nI can acknowledge it.\nI can tell you that your hurt mattered.\nBecause you mattered.\n\nWith regret,\nMe`},
+      {id:'wish-i-said-earlier',title:'I Wish I Had Said This Earlier',preview:'There are words that become heavier the longer we carry them...',content:`Dear You,\n\nThere are words that become heavier the longer we carry them.\nThis is one of them.\n\nI wish I had said this earlier.\nI wish I had spoken when pride was still small.\nWhen distance was still bridgeable.\n\nInstead, I waited.\nAnd waiting turned simple conversations into impossible ones.\n\nYou deserved honesty sooner.\n\nWith late honesty,\nMe`},
+      {id:'person-i-lost',title:'To The Person I Lost',preview:'Some losses happen suddenly. Ours happened slowly...',content:`Dear You,\n\nSome losses happen suddenly.\nOurs happened slowly.\nConversation by conversation.\nMisunderstanding by misunderstanding.\n\nI don't know if we could have saved it.\nBut I do know this:\nWhat we had mattered.\n\nYou were important.\nThe memories were real.\nAnd even though life moved forward,\na part of me still hopes you are doing well.\n\nWith respect,\nSomeone who remembers`},
+      {id:'please-forgive',title:'Please Forgive Me',preview:'Please forgive me. Not because I deserve it. Not because forgiveness is owed...',content:`Dear You,\n\nPlease forgive me.\nNot because I deserve it.\nNot because forgiveness is owed.\nBut because carrying pain is exhausting.\n\nThis letter is not a demand.\nIt is a request.\nA quiet one.\n\nIf forgiveness ever finds its way into your heart,\nI hope it brings peace to you first.\nBecause your healing matters more than my comfort.\n\nWith hope,\nMe`},
+      {id:'if-we-never-speak',title:'If We Never Speak Again',preview:'If we never speak again, there are things I want you to know...',content:`Dear You,\n\nIf we never speak again,\nthere are things I want you to know.\n\nThank you.\nFor the conversations.\nFor the laughter.\nFor the lessons.\nFor the version of me that existed because you were there.\n\nI wish our story ended differently.\nBut not every meaningful story gets a happy ending.\nSome stories simply leave us changed.\n\nSo if this is goodbye,\nlet it be a gentle one.\n\nI hope life is kind to you.\n\nGoodbye,\nWith no bitterness`}
+    ]
+  },
+  family:{
+    title:'Letters to Family',
+    letters:[
+      {id:'to-mother-family',title:'To My Mother',preview:'There are many things I never said because I assumed you already knew...',content:`Dear Mother,\n\nThere are many things I never said because I assumed you already knew.\n\nThank you for every ordinary thing that was never ordinary.\nThe meals that appeared without being asked for.\nThe worry hidden behind questions.\nThe nights you stayed awake longer than necessary.\n\nNot perfect.\nNot flawless.\nHuman.\n\nAnd somehow that makes your love more beautiful.\n\nThank you for trying.\nThank you for staying.\n\nWith love,\nYour child`},
+      {id:'to-father-family',title:'To My Father',preview:'As a child, I saw the roof. As I grew older, I noticed the weight you carried...',content:`Dear Father,\n\nAs a child, I saw the roof.\nAs I grew older, I noticed the weight you carried to keep it standing.\n\nYou were not always expressive.\nSometimes I wished for softer words.\nBut today I understand:\nLove does not always arrive in the form we expect.\nSometimes it arrives as sacrifice.\n\nThank you for everything I noticed and everything I didn't.\n\nWith appreciation,\nYour child`},
+      {id:'to-parents',title:'To My Parents',preview:'Thank you for the things you gave me. The food. The shelter. The opportunities...',content:`Dear Mom and Dad,\n\nThank you for the things you gave me.\nThe food.\nThe shelter.\nThe opportunities.\nThe lessons.\n\nBut thank you most for the effort.\nBecause effort is what remains visible after years pass.\n\nI hope one day we understand each other more clearly.\nUntil then, thank you for trying.\n\nWith gratitude,\nYour child`},
+      {id:'to-sibling-family',title:'To My Sibling',preview:'Nobody knows my childhood the way you do. You remember the embarrassing stories...',content:`Dear Sibling,\n\nNobody knows my childhood the way you do.\nYou remember the embarrassing stories.\nThe ridiculous arguments.\nThe inside jokes nobody else understands.\n\nYou witnessed versions of me the world never met.\nAnd somehow, after all these years, you're still here.\n\nThank you for being family.\nThank you for being friendship.\n\nWith affection,\nYour forever teammate`},
+      {id:'family-we-built',title:'The Family We Built',preview:'Not every family begins with blood. Some are built through trust...',content:`Dear Family,\n\nNot every family begins with blood.\nSome are built through trust.\nSome through loyalty.\nSome through years of choosing each other again and again.\n\nThank you for becoming my safe place.\nThank you for proving that home can be created.\nThat belonging can be built.\nThat love can be chosen.\n\nWith gratitude,\nOne of yours`},
+      {id:'thank-you-raising',title:'Thank You For Raising Me',preview:'Raising someone is strange. You spend years teaching them how to walk away from you...',content:`Dear Family,\n\nRaising someone is strange.\nYou spend years teaching them how to walk away from you.\nHow to think independently.\nHow to build their own life.\n\nThank you for every lesson.\nEvery correction.\nEvery conversation.\nEvery sacrifice.\n\nI am still becoming who I am.\nBut whoever that person becomes will carry pieces of you forever.\n\nWith appreciation,\nMe`},
+      {id:'what-i-never-told',title:'What I Never Told You',preview:'There are things I never knew how to explain. Days when I looked fine but wasn\'t...',content:`Dear Family,\n\nThere are things I never knew how to explain.\nDays when I looked fine but wasn't.\nMoments when I needed comfort but chose silence instead.\n\nI wasn't hiding because I didn't trust you.\nI was hiding because I didn't understand myself either.\n\nI wish I had spoken more.\nBut this letter is a beginning.\n\nWith honesty,\nYour child`},
+      {id:'i-love-you-but',title:'I Love You, But...',preview:'I love you. But love is not the same thing as agreement...',content:`Dear Family,\n\nI love you.\nBut love is not the same thing as agreement.\nI love you.\nBut some moments hurt.\n\nBoth things can be true.\nThe gratitude and the disappointment.\nThe affection and the frustration.\n\nI don't write this letter to blame.\nI write it because honesty deserves space too.\n\nI love you.\nAnd sometimes I wish we understood each other better.\n\nWith sincerity,\nMe`},
+      {id:'to-future-child',title:'To My Future Child',preview:'I don\'t promise perfection. But I promise effort. I promise listening...',content:`Dear Future Child,\n\nI don't promise perfection.\nI don't think any parent can.\nBut I promise effort.\nI promise listening.\nI promise apologies when I am wrong.\nI promise that your feelings will matter.\n\nI will make mistakes.\nMany of them.\nBut I hope you always know one thing:\n\nYou were loved long before you understood the word.\n\nWith love,\nYour future parent`},
+      {id:'home-complicated',title:'Home Is Complicated',preview:'You were never simple. You were laughter and arguments. Comfort and confusion...',content:`Dear Home,\n\nYou were never simple.\nYou were laughter and arguments.\nComfort and confusion.\nWarmth and frustration.\n\nSometimes you healed me.\nSometimes you hurt me.\nAnd somehow, despite everything, you remained home.\n\nYou taught me many things.\nSome beautiful.\nSome painful.\nAll unforgettable.\n\nWith complicated love,\nMe`}
+    ]
+  },
+  yourself:{
+    title:'Letters to Yourself',
+    letters:[
+      {id:'future-self',title:'To My Future Self',preview:'If you\'re reading this, then time did its job. You survived days I cannot see yet...',content:`Dear Future Me,\n\nIf you're reading this, then time did its job.\nYou survived days I cannot see yet.\nYou walked roads I have not reached.\n\nRight now, I am full of questions.\nI don't know which dreams survive.\nI don't know which fears disappear.\n\nBut I hope you became kinder to yourself.\nI hope you stopped measuring your worth through achievements alone.\n\nWherever you are,\nI am proud of you for making it there.\n\nWith hope,\nYour Past Self`},
+      {id:'bad-day',title:'Read This On A Bad Day',preview:'Take a breath. Not because everything will magically improve...',content:`Dear Me,\n\nTake a breath.\nNot because everything will magically improve.\nBecause you deserve a moment of kindness.\n\nToday feels heavy.\nI know.\n\nBut this day is not your entire life.\nBad days are loud.\nThey convince us they are permanent.\nThey aren't.\n\nYou have survived days that felt impossible before.\nYou will survive this one too.\n\nFor now,\ndrink water.\nRest.\nAnd be gentle with yourself.\nThat's enough.\n\nWith care,\nMe`},
+      {id:'proud-of-you',title:"I'm Proud Of You",preview:"I don't say this often enough. I'm proud of you. Not because you were perfect...",content:`Dear Me,\n\nI don't say this often enough.\nI'm proud of you.\n\nNot because you were perfect.\nNot because you always succeeded.\nBecause you kept going.\n\nYou tried again after disappointment.\nYou stood up after embarrassment.\nYou survived moments that could have made you give up.\n\nAnd despite everything,\nyou are still here.\n\nThat matters.\nMore than grades.\nMore than trophies.\nMore than other people's opinions.\n\nWith admiration,\nMe`},
+      {id:'person-becoming',title:'The Person I\'m Becoming',preview:'You are not finished. And that is beautiful. You are still learning...',content:`Dear Me,\n\nYou are not finished.\nAnd that is beautiful.\n\nYou are still learning.\nStill growing.\nStill making mistakes.\nStill changing.\n\nSometimes you compare yourself to people who seem farther ahead.\nDon't.\n\nYou are not becoming them.\nYou are becoming you.\nAnd that journey has its own timeline.\n\nTrust it.\n\nWith patience,\nMe`},
+      {id:'everything-feels-heavy',title:'When Everything Feels Heavy',preview:'You do not have to carry everything today...',content:`Dear Me,\n\nYou do not have to carry everything today.\nNot every responsibility.\nNot every expectation.\nNot every fear.\n\nYou are allowed to put some of it down.\n\nYou are human.\nNot a machine.\nRest is not failure.\nRest is preparation.\n\nSo please,\nstop treating exhaustion like an achievement.\n\nWith understanding,\nMe`},
+      {id:'dont-give-up',title:"Please Don't Give Up",preview:"I know you're tired. I know there are days when continuing feels harder than stopping...",content:`Dear Me,\n\nI know you're tired.\nI know there are days when continuing feels harder than stopping.\n\nBut please don't give up.\nNot today.\nNot yet.\n\nThere are conversations you haven't had.\nBooks you haven't read.\nPlaces you haven't seen.\nPeople you haven't met.\nVersions of yourself you haven't discovered.\n\nStay.\nNot because life is always beautiful.\nBecause possibility still exists.\n\nWith stubborn hope,\nMe`},
+      {id:'younger-self',title:'A Letter To My Younger Self',preview:'First of all, none of this was your fault. You were learning. You were growing...',content:`Dear Little Me,\n\nFirst of all,\nnone of this was your fault.\n\nYou were learning.\nYou were growing.\nYou were carrying things far too big for your small shoulders.\n\nI know you felt different.\nI know you felt misunderstood.\n\nI wish I could sit beside you.\nI wish I could tell you that you survive.\nNot perfectly.\nBut beautifully.\n\nYou become stronger.\nKinder.\nWiser.\nAnd one day,\nyou learn to love yourself.\n\nWith love,\nYour Older Self`},
+      {id:'from-younger-self',title:'A Letter From My Younger Self',preview:'Did we do it? Did we become someone we\'re proud of?...',content:`Dear Older Me,\n\nDid we do it?\nDid we become someone we're proud of?\n\nI hope you still laugh at silly things.\nI hope you still imagine impossible stories.\nI hope life didn't convince you to become cold.\n\nPlease tell me we didn't lose our curiosity.\nPlease tell me we still believe in wonder.\n\nAnd if things became difficult,\nplease remember me.\nThe child who believed anything was possible.\n\nWith trust,\nYour Younger Self`}
+    ]
+  },
+  goodbye:{
+    title:'Letters of Goodbye',
+    letters:[
+      {id:'thank-you-goodbye',title:'Thank You, Goodbye',preview:'This is not a letter asking you to stay. It is a letter thanking you for coming...',content:`Dear You,\n\nThis is not a letter asking you to stay.\nIt is a letter thanking you for coming.\n\nYou changed something in me.\nMaybe you never meant to.\n\nSome people arrive like storms.\nYou arrived like a season.\nSlowly.\nQuietly.\n\nI wish things had lasted longer.\nBut instead of holding bitterness,\nI choose gratitude.\n\nThank you for every memory.\nAnd now,\ngoodbye.\n\nWith peace,\nSomeone who will remember`},
+      {id:'loved-you-enough',title:'I Loved You Enough To Leave',preview:'Leaving was not the absence of love. It was the consequence of it...',content:`Dear You,\n\nLeaving was not the absence of love.\nIt was the consequence of it.\n\nBecause I loved you enough to stop begging.\nLoved you enough to stop forcing what no longer wanted to stay.\nLoved myself enough to walk away.\n\nFor a long time I confused suffering with devotion.\nIt didn't prove my love.\nIt only proved my exhaustion.\n\nSo I am leaving.\nNot because I stopped caring.\nBecause I finally learned that love should not require someone to disappear inside it.\n\nI hope life is kind to you.\nI truly do.\n\nWith sincerity,\nMe`},
+      {id:'beautiful-mistake',title:'We Were A Beautiful Mistake',preview:'Maybe we were never meant to last. Maybe we were only meant to happen...',content:`Dear You,\n\nMaybe we were never meant to last.\nMaybe we were only meant to happen.\nLike a sunset.\nLike a shooting star.\nLike a song that feels too short.\n\nNot every beautiful thing is permanent.\nAnd perhaps that was our tragedy.\nOr perhaps it was our purpose.\n\nI do not regret meeting you.\nI do not regret loving you.\nEven the ending cannot steal the beauty that existed before it.\n\nWe happened.\nAnd that is enough.\n\nWith affection,\nYour Once Upon A Time`},
+      {id:'the-last-letter',title:'The Last Letter',preview:'There is no hidden meaning here. No secret request. This is simply the last letter...',content:`Dear You,\n\nThere is no hidden meaning here.\nNo secret request.\nNo final attempt.\n\nThis is simply the last letter.\nThe final page.\nThe closing sentence.\n\nYou taught me things.\nSome beautiful.\nSome painful.\nBoth mattered.\n\nAnd now I release the story.\n\nTake care of yourself.\nTruly.\n\nGoodbye.\n\nWith acceptance,\nMe`},
+      {id:'outgrew-each-other',title:'We Outgrew Each Other',preview:'Neither of us became the villain. Instead, we became strangers carrying old memories...',content:`Dear You,\n\nNeither of us became the villain.\nThat would have been easier.\nInstead, we became strangers carrying old memories.\n\nThe person I needed became someone else.\nThe person you needed became someone else too.\n\nI don't hate you.\nI don't even blame you.\nSome flowers are not meant to bloom in the same season forever.\n\nWe outgrew each other.\nAnd perhaps that is not failure.\nPerhaps it is simply life.\n\nWith acceptance,\nMe`},
+      {id:'to-friend-i-lost',title:'To The Friend I Lost',preview:'You are alive somewhere. So am I. And yet, it feels as though we exist in different worlds...',content:`Dear Old Friend,\n\nYou are alive somewhere.\nSo am I.\nAnd yet, it feels as though we exist in different worlds.\n\nI still laugh when I remember certain memories.\nI still hear your voice in some jokes.\nI still think, "I should tell them this,"\nbefore remembering I no longer do.\n\nI hope life is kind to you.\nI hope you are happy.\nAnd I hope you know you mattered.\n\nWith affection,\nAn Old Friend`},
+      {id:'i-forgive-you',title:'I Forgive You',preview:'For a long time, I carried the weight of what happened...',content:`Dear You,\n\nFor a long time,\nI carried the weight of what happened.\nNot because I wanted revenge.\nBecause I wanted understanding.\n\nBut eventually I learned something.\nSome apologies never arrive.\nSome explanations never come.\nAnd waiting forever only hurts the person who waits.\n\nSo today,\nI release the anger.\nNot because what happened was acceptable.\nBecause I deserve freedom.\n\nI forgive you.\nFor me.\n\nWith freedom,\nMe`},
+      {id:'i-forgive-myself',title:'I Forgive Myself',preview:'This might be the hardest letter I have ever written. Because forgiving others was easier...',content:`Dear Me,\n\nThis might be the hardest letter I have ever written.\nBecause forgiving others was easier.\n\nI carried my mistakes like evidence.\nI replayed every failure.\nEvery embarrassment.\nEvery wrong decision.\n\nAs if punishment could change the past.\nIt cannot.\n\nI was learning.\nI was growing.\nI was human.\n\nToday,\nI stop treating myself like a crime scene.\nI forgive myself.\n\nWith compassion,\nMe`}
+    ]
+  },
+  seasonal:{
+    title:'Seasonal Letters',
+    letters:[
+      {id:'valentines',title:"Valentine's Day",preview:'If flowers could speak, I think they would spend the entire spring trying to describe you...',content:`Dear You,\n\nIf flowers could speak, I think they would spend the entire spring trying to describe you and still fail.\n\nSo I will try instead.\n\nThank you for every smile, every conversation, every moment that quietly became one of my favorite memories.\n\nLoving you has never felt like a duty.\nIt feels like discovering a beautiful poem hidden inside an ordinary day.\n\nHappy Valentine's Day.\n\nForever admiring you,\nMe`},
+      {id:'birthday',title:'Birthday Letter',preview:'Another year has chosen you. Another year of your laughter and your strange little habits...',content:`Dear You,\n\nAnother year has chosen you.\nAnother year of your laughter, your mistakes, your victories, your strange little habits that make you who you are.\n\nI hope today feels lighter than usual.\nI hope people remind you how valuable you are.\n\nMost importantly, I hope you remember that growing older is not losing yourself.\nIt is becoming more of who you were always meant to be.\n\nThank you for existing in the same timeline as me.\n\nHappy Birthday.\n\nWith warm wishes,\nMe`},
+      {id:'christmas',title:'Christmas Letter',preview:'Some people associate Christmas with lights. When I think of Christmas, I think of warmth...',content:`Dear You,\n\nSome people associate Christmas with lights.\nOthers think of gifts.\nBut when I think of Christmas, I think of warmth.\n\nThe warmth of people who matter.\n\nSo wherever you are tonight, I hope warmth finds you.\nMay your home feel softer.\nMay your heart feel lighter.\nMay your worries rest for a while.\n\nMerry Christmas.\n\nWith affection,\nMe`},
+      {id:'new-year',title:'New Year Letter',preview:'A new year stands quietly at the door. Before it enters, I wanted to thank you...',content:`Dear You,\n\nA new year stands quietly at the door.\nBefore it enters, I wanted to thank you.\n\nFor every memory.\nEvery lesson.\nEvery moment that made the last year worth remembering.\n\nI hope it brings you peace where you need peace.\nCourage where you need courage.\nAnd happiness where you least expect it.\n\nLeave behind what hurts.\nCarry forward what matters.\n\nHappy New Year.\n\nFor all the days ahead,\nMe`},
+      {id:'mothers-day',title:"Mother's Day",preview:'There are many things I forgot. But I never forgot the feeling of being cared for...',content:`Dear Mom,\n\nThere are many things I forgot.\nBut I never forgot the feeling of being cared for.\n\nThe small sacrifices.\nThe silent worries.\nThe countless moments that looked ordinary but were actually love.\n\nThank you for every effort I noticed.\nAnd thank you for every effort I didn't.\n\nHappy Mother's Day.\n\nWith love,\nYour Child`},
+      {id:'fathers-day',title:"Father's Day",preview:'Some people express love with words. Others express it through responsibility...',content:`Dear Dad,\n\nSome people express love with words.\nOthers express it through responsibility.\nThrough showing up.\nThrough carrying weight without announcing it.\n\nThank you for every effort made quietly.\nFor every burden carried without complaint.\n\nI may not always say it.\nBut I notice more than you think.\nAnd I appreciate more than I express.\n\nHappy Father's Day.\n\nWith respect and gratitude,\nYour Child`},
+      {id:'friendship-day',title:'Friendship Day',preview:'Friendship is a strange kind of miracle. Two completely different lives somehow decide to walk together...',content:`Dear Friend,\n\nFriendship is a strange kind of miracle.\nTwo completely different lives somehow decide to walk beside each other.\n\nThrough ordinary days.\nThrough disasters.\nThrough inside jokes that make no sense to anyone else.\n\nThank you for being part of my story.\nThank you for every laugh that arrived exactly when it was needed.\n\nHappy Friendship Day.\n\nWith gratitude,\nYour Friend`},
+      {id:'graduation',title:'Graduation Day',preview:'Today is not just about a certificate. It is about every late night. Every doubt...',content:`Dear You,\n\nToday is not just about a certificate.\nIt is about every late night.\nEvery doubt.\nEvery mistake.\nEvery moment you wanted to quit but didn't.\n\nI hope you also celebrate the version of yourself that survived the journey.\n\nBe proud of yourself.\nYou earned this.\n\nCongratulations on your graduation.\n\nWith admiration,\nMe`},
+      {id:'eid',title:'Eid Mubarak',preview:'As this beautiful day arrives, I hope it brings peace into your home and light into your heart...',content:`Dear You,\n\nAs this beautiful day arrives, I hope it brings peace into your home and light into your heart.\n\nMay your table be full.\nMay your prayers be answered.\nMay your loved ones remain close.\nAnd may happiness find you even in places where you were not looking for it.\n\nEid Mubarak.\n\nWith warm wishes,\nMe`},
+      {id:'diwali',title:'Diwali',preview:'Tonight, thousands of lamps will push back the darkness. And somehow, that feels like hope...',content:`Dear You,\n\nTonight, thousands of lamps will push back the darkness.\nAnd somehow, that feels like hope.\n\nI hope this Diwali fills your life with the same warmth those lamps bring to the night.\n\nMay old worries lose their power.\nMay new opportunities find their way to your door.\nMay laughter stay longer.\n\nThe world shines a little brighter because people like you exist within it.\n\nHappy Diwali.\n\nWith light and love,\nMe`},
+      {id:'raksha-bandhan',title:'Raksha Bandhan',preview:'Some bonds are chosen. Some are given. Ours was given to us before either of us had a say...',content:`Dear Brother / Sister,\n\nSome bonds are chosen.\nSome are given.\nOurs was given to us before either of us had a say.\n\nAnd somehow, through arguments, laughter, teasing, and countless memories,\nit became one of the strongest parts of my life.\n\nThank you for being annoying when necessary.\nProtective when needed.\nAnd present when it mattered.\n\nHappy Raksha Bandhan.\n\nWith love,\nYour Sibling`},
+      {id:'teachers-day',title:"Teacher's Day",preview:'There are lessons that remain in books. And there are lessons that remain in people...',content:`Dear Teacher,\n\nThere are lessons that remain in books.\nAnd there are lessons that remain in people.\n\nThank you for the second kind.\n\nThank you for every effort that went unnoticed.\nFor every explanation repeated patiently.\nFor every encouragement offered at exactly the right moment.\n\nHappy Teacher's Day.\n\nWith gratitude,\nA Student`},
+      {id:'anniversary',title:'Anniversary Letter',preview:'Another year. Another chapter. Another collection of moments I would not trade for anything...',content:`Dear You,\n\nAnother year.\nAnother chapter.\nAnother collection of moments I would not trade for anything.\n\nThank you for every memory we created together.\nThe grand moments.\nThe small moments.\nAnd especially the ordinary moments that quietly became precious.\n\nIf I could choose again, I would still choose this journey.\nI would still choose you.\n\nHappy Anniversary.\n\nWith love,\nMe`}
+    ]
+  },
+  timecapsule:{
+    title:'Time Capsule Letters',
+    letters:[
+      {id:'open-sad',title:'Open When You\'re Sad',preview:'If you\'re opening this, I wish I could sit beside you for a moment. Not to fix anything. Just to stay...',content:`Dear You,\n\nIf you're opening this, I wish I could sit beside you for a moment.\nNot to fix anything.\nJust to stay.\n\nSadness has a strange way of convincing us that it will last forever.\nIt won't.\n\nPlease be gentle with yourself tonight.\nDrink water.\nRest if you can.\nCry if you need to.\nThere is no prize for carrying pain silently.\n\nAnd remember this:\nYou have survived days you once thought would break you.\nYou are still here.\nThat means something.\n\nWith care,\nSomeone Who Believes In You`},
+      {id:'open-angry',title:'Open When You\'re Angry',preview:'Before you do anything, pause. Not because your feelings are invalid...',content:`Dear You,\n\nBefore you do anything,\npause.\n\nNot because your feelings are invalid.\nBecause your feelings matter.\n\nAnger is often grief wearing armor.\nSometimes it is disappointment.\nSometimes it is love that did not know where to go.\n\nTake a breath.\nWalk away for a moment.\n\nYou do not need to make permanent decisions during temporary storms.\n\nThe fire will settle.\nAnd when it does,\nyou will know what to do.\n\nWith patience,\nMe`},
+      {id:'open-doubting',title:'Open When You\'re Doubting Yourself',preview:'I know what your mind is doing. It is collecting every mistake, every failure...',content:`Dear You,\n\nI know what your mind is doing.\nIt is collecting every mistake.\nEvery failure.\nEvery reason you think you are not enough.\nAnd it is presenting them as evidence.\n\nBut your mind is not always a reliable narrator.\n\nYou are more than your worst day.\nMore than your biggest mistake.\nMore than the fear currently speaking.\n\nDo not confuse being unfinished with being unworthy.\n\nWith faith,\nMe`},
+      {id:'open-miss-me',title:'Open When You Miss Me',preview:'Hi. I suppose that means I\'m somewhere else right now. But let this letter do what I cannot...',content:`Dear You,\n\nHi.\n\nI suppose that means I'm somewhere else right now.\nMaybe far away.\nMaybe simply busy.\n\nBut if you're opening this,\nthen let this letter do what I cannot.\nSit beside you.\n\nI hope you know missing someone is not weakness.\nIt is proof that something mattered.\n\nThank you for every memory.\nThank you for every ordinary moment that quietly became special.\n\nMissing you too,\nMe`},
+      {id:'open-alone',title:'Open When You Feel Alone',preview:'Loneliness is a strange thing. Sometimes it appears in crowded rooms...',content:`Dear You,\n\nLoneliness is a strange thing.\nSometimes it appears in crowded rooms.\nSometimes it arrives in complete silence.\n\nBut do not let it move in.\n\nYou matter more than you realize.\nYour existence touches lives you will never fully understand.\n\nSo tonight,\nif loneliness is visiting,\nlet it visit.\nBut do not let it move in.\n\nYou are not as alone as you feel.\n\nWith warmth,\nMe`},
+      {id:'open-reminder',title:'Open When You Need A Reminder',preview:'This is your reminder. You are allowed to rest. You are allowed to make mistakes...',content:`Dear You,\n\nThis is your reminder.\n\nYou are allowed to rest.\nYou are allowed to make mistakes.\nYou are allowed to change your mind.\nYou are allowed to grow beyond old versions of yourself.\nYou are allowed to be proud of how far you've come.\n\nLife is not a race.\nHealing is not a race.\nBecoming yourself is not a race.\n\nMove at the pace your heart can carry.\n\nWith affection,\nMe`},
+      {id:'open-quit',title:'Open When You Want To Quit',preview:'Before you quit, wait one more day. Not forever. Just one more day...',content:`Dear You,\n\nBefore you quit,\nwait one more day.\nNot forever.\nJust one more day.\n\nThe version of you reading this is tired.\nI know.\nBut tired is not the same thing as finished.\n\nRest.\nCry.\nComplain.\nSleep for twelve hours if necessary.\n\nBut tomorrow deserves a chance to exist before you decide.\n\nOne more sunrise.\nOne more day.\n\nWith stubborn hope,\nMe`},
+      {id:'open-birthday',title:'Open On Your Birthday',preview:'Happy Birthday. I wonder where you are right now. What changed? What stayed the same?...',content:`Dear Future You,\n\nHappy Birthday.\n\nI wonder where you are right now.\nWhat changed?\nWhat stayed the same?\nDo you still laugh at the same jokes?\nDo you still dream about impossible things?\n\nWhatever happened between the writing of this letter and the reading of it,\nI hope you are proud of yourself.\nNot because you became perfect.\nBecause you kept going.\n\nAnother year chose you.\nAnd somehow, despite everything, you are still here.\n\nCelebrate that.\nToday belongs to you.\n\nWith love from a different version of yourself,\nMe`},
+      {id:'open-bad-day',title:'Open After A Bad Day',preview:'Well. That day sucked. Let\'s call it what it was...',content:`Dear You,\n\nWell.\nThat day sucked.\nLet's call it what it was.\n\nNot every day has a lesson.\nNot every day becomes a beautiful memory.\nSome days are simply difficult.\nAnd that is okay.\n\nA bad day is not a bad life.\nIt is not a bad future.\nIt is not a final verdict.\nIt is one page.\nOne page in a very long book.\n\nTomorrow does not know what happened today.\nGive it a chance.\n\nWith gentleness,\nMe`},
+      {id:'open-happy',title:'Open When You\'re Happy',preview:'Stop. Seriously. Stop for a second. Look at yourself. You\'re smiling...',content:`Dear You,\n\nStop.\nSeriously.\nStop for a second.\n\nLook at yourself.\nYou're smiling.\nYou're breathing easier.\nSomething went right.\n\nYou spend so much time surviving difficult moments\nthat sometimes you forget to celebrate good ones.\n\nSo celebrate this.\nTake a picture.\nWrite it down.\nTell someone.\n\nHappiness deserves attention too.\nNot just pain.\n\nI hope this moment stays longer than expected.\n\nWith joy,\nMe`},
+      {id:'open-rainy',title:'Open On A Rainy Evening',preview:'The rain is here again. Maybe you\'re sitting near a window...',content:`Dear You,\n\nThe rain is here again.\nMaybe you're sitting near a window.\nMaybe you're listening to it tap softly against the world.\n\nRain has always felt like a conversation nobody else can hear.\nA reminder that slowing down is allowed.\n\nSo tonight,\ndo not rush.\nWatch the rain.\nListen to a song.\nRead something beautiful.\nLet yourself exist without needing to achieve anything.\n\nThe world can wait a little.\nThis evening belongs to you.\n\nWith calm,\nMe`},
+      {id:'open-better',title:'Open When Life Finally Gets Better',preview:'You made it. Not to perfection. Not to the end. But to a better place...',content:`Dear You,\n\nYou made it.\nNot to perfection.\nNot to the end.\nBut to a better place.\n\nThe version writing this letter hoped this day would come.\nAnd now you're living inside it.\n\nPlease don't rush past it.\nStay here for a while.\nLook around.\nNotice how far you've traveled.\nNotice how many storms are now behind you.\n\nThis is what you were fighting for.\nEnjoy it.\n\nWith pride,\nThe Version Who Never Stopped Believing`},
+      {id:'open-five-years',title:'Open Five Years From Now',preview:'I call you a stranger because five years can change a person completely...',content:`Dear Future Stranger,\n\nI call you a stranger because five years can change a person completely.\n\nMaybe your dreams changed.\nMaybe your city changed.\nMaybe your heart changed.\n\nI wonder if you still remember the person writing this.\nThe worries they carried.\nThe hopes they protected.\n\nIf some of those dreams came true,\nI'm happy for you.\nIf they didn't,\nI hope you found better ones.\n\nEither way,\nthank you for continuing the story.\nThe future was always yours.\n\nWith curiosity,\nYour Past Self`}
     ]
   }
 };
 
-let currentCategory = 'love';
-let currentLetterContent = '';
+let currentCategory='love';
 
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0, 0);
-}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+function showCategories(){showScreen('screen-categories');}
+function goBackToLetters(){showLetters(currentCategory);}
 
-function showCategories() {
-  showScreen('screen-categories');
-}
-
-function showLetters(category) {
-  currentCategory = category;
-  const data = lettersData[category];
-  if (!data) {
-    alert('Coming soon! We are writing these letters with care. 🌸');
-    return;
-  }
-  document.getElementById('current-cat-name').textContent = data.title;
-  document.getElementById('letters-title').textContent = data.title;
-  const grid = document.getElementById('letters-grid');
-  grid.innerHTML = '';
-
-  data.letters.forEach((letter, i) => {
-    const card = document.createElement('div');
-    card.className = 'letter-card';
-    card.style.animationDelay = (i * 0.06) + 's';
-    card.innerHTML = `
-      <div class="letter-title">${letter.title}</div>
-      <div class="letter-preview">${letter.preview}</div>
-    `;
-    card.onclick = () => openLetter(letter);
+function showLetters(category){
+  currentCategory=category;
+  const data=lettersData[category];
+  if(!data){alert('Coming soon! 🌸');return;}
+  document.getElementById('current-cat-name').textContent=data.title;
+  document.getElementById('letters-title').textContent=data.title;
+  const grid=document.getElementById('letters-grid');
+  grid.innerHTML='';
+  data.letters.forEach((letter,i)=>{
+    const card=document.createElement('div');
+    card.className='letter-card';
+    card.style.animationDelay=(i*0.05)+'s';
+    card.innerHTML=`<div class="letter-title">${letter.title}</div><div class="letter-preview">${letter.preview}</div>`;
+    card.onclick=()=>openLetter(letter);
     grid.appendChild(card);
   });
-
-  // Write your own card
-  const ownCard = document.createElement('div');
-  ownCard.className = 'write-own-card';
-  ownCard.innerHTML = `
-    <div class="cat-icon">✍️</div>
-    <div class="cat-name" style="font-family:'IM Fell English',serif;font-size:1.1rem;font-style:italic;color:var(--ink);margin-bottom:0.4rem;">Write Your Own</div>
-    <div class="cat-desc" style="font-family:'Lora',serif;font-style:italic;font-size:0.75rem;color:var(--sepia);">Everyone deserves to gift — even if they do not know how to begin. Start with a blank page.</div>
-  `;
-  ownCard.onclick = () => showScreen('screen-write-own');
-  grid.appendChild(ownCard);
-
+  const own=document.createElement('div');
+  own.className='write-own-card';
+  own.style.animationDelay=(data.letters.length*0.05)+'s';
+  own.innerHTML=`<div class="cat-icon">✍️</div><div class="cat-name" style="font-family:'IM Fell English',serif;font-size:1.1rem;font-style:italic;color:var(--ink);margin-bottom:0.4rem;">Write Your Own</div><div class="cat-desc" style="font-family:'Lora',serif;font-style:italic;font-size:0.75rem;color:var(--sepia);">Everyone deserves to gift — even if they don't know how to begin. Start with a blank page.</div>`;
+  own.onclick=()=>showScreen('screen-write-own');
+  grid.appendChild(own);
   showScreen('screen-letters');
 }
 
-function goBackToLetters() {
-  showLetters(currentCategory);
-}
-
-function openLetter(letter) {
-  document.getElementById('view-title').textContent = letter.title;
-  document.getElementById('view-letter-name').textContent = letter.title;
-  document.getElementById('view-cat-name').textContent = lettersData[currentCategory].title;
-  document.getElementById('letter-textarea').value = letter.content;
-  currentLetterContent = letter.content;
+function openLetter(letter){
+  document.getElementById('view-title').textContent=letter.title;
+  document.getElementById('view-letter-name').textContent=letter.title;
+  document.getElementById('view-cat-name').textContent=lettersData[currentCategory].title;
+  document.getElementById('letter-textarea').value=letter.content;
   showScreen('screen-letter-view');
 }
 
-function generateLink() {
-  const content = document.getElementById('letter-textarea').value;
-  const encoded = btoa(unescape(encodeURIComponent(content)));
-  const link = `${window.location.origin}/read.html?letter=${encoded}`;
-  document.getElementById('share-link-display').textContent = link;
+function generateLink(){
+  const content=document.getElementById('letter-textarea').value;
+  const encoded=btoa(unescape(encodeURIComponent(content)));
+  const link=`${window.location.origin}/read.html?letter=${encoded}`;
+  document.getElementById('share-link-display').textContent=link;
   showScreen('screen-share');
 }
 
-function generateOwnLink() {
-  const content = document.getElementById('own-textarea').value;
-  if (!content.trim()) { alert('Please write something first. 🌸'); return; }
-  const encoded = btoa(unescape(encodeURIComponent(content)));
-  const link = `${window.location.origin}/read.html?letter=${encoded}`;
-  document.getElementById('share-link-display').textContent = link;
+function generateOwnLink(){
+  const content=document.getElementById('own-textarea').value;
+  if(!content.trim()){alert('Please write something first. 🌸');return;}
+  const encoded=btoa(unescape(encodeURIComponent(content)));
+  const link=`${window.location.origin}/read.html?letter=${encoded}`;
+  document.getElementById('share-link-display').textContent=link;
   showScreen('screen-share');
 }
 
-function copyLink() {
-  const link = document.getElementById('share-link-display').textContent;
-  navigator.clipboard.writeText(link).then(() => {
-    const confirm = document.getElementById('copy-confirm');
-    confirm.style.display = 'block';
-    setTimeout(() => confirm.style.display = 'none', 3000);
+function copyLink(){
+  const link=document.getElementById('share-link-display').textContent;
+  navigator.clipboard.writeText(link).then(()=>{
+    const c=document.getElementById('copy-confirm');
+    c.style.display='block';
+    setTimeout(()=>c.style.display='none',3000);
   });
 }
 
-// Canvas petals
-const canvas = document.getElementById('petals-canvas');
-const ctx = canvas.getContext('2d');
-let W = canvas.width = window.innerWidth;
-let H = canvas.height = window.innerHeight;
-window.addEventListener('resize', () => { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; });
-let mouse = { x: W/2, y: H/2 };
-document.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
-const colors = ['rgba(232,180,173,','rgba(201,132,122,','rgba(201,169,110,','rgba(138,159,138,'];
-const symbols = ['♡','✉','✦','❀','✿'];
-class Particle {
-  constructor() { this.reset(true); }
-  reset(init) {
-    this.x = Math.random()*W; this.y = init?Math.random()*H:-30;
-    this.size = Math.random()*6+2; this.speedY = Math.random()*0.5+0.2;
-    this.speedX = (Math.random()-0.5)*0.3; this.opacity = Math.random()*0.35+0.1;
-    this.rotation = Math.random()*Math.PI*2; this.rotSpeed = (Math.random()-0.5)*0.015;
-    this.type = Math.random()<0.65?'petal':'symbol';
-    this.color = colors[Math.floor(Math.random()*colors.length)];
-    this.symbol = symbols[Math.floor(Math.random()*symbols.length)];
-    this.wobble = Math.random()*Math.PI*2; this.wobbleSpeed = Math.random()*0.015+0.004;
-  }
-  update() {
-    this.wobble+=this.wobbleSpeed; this.x+=this.speedX+Math.sin(this.wobble)*0.3; this.y+=this.speedY;
-    this.rotation+=this.rotSpeed;
-    const dx=this.x-mouse.x,dy=this.y-mouse.y,dist=Math.sqrt(dx*dx+dy*dy);
-    if(dist<70){this.x+=dx/dist*0.5;this.y+=dy/dist*0.5;}
-    if(this.y>H+30)this.reset(false);
-  }
-  draw() {
-    ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.rotation);ctx.globalAlpha=this.opacity;
-    if(this.type==='petal'){
-      ctx.fillStyle=this.color+'1)';ctx.beginPath();
-      ctx.ellipse(0,0,this.size,this.size*1.6,0,0,Math.PI*2);ctx.fill();
-    } else {
-      ctx.font=`${this.size*1.8}px serif`;ctx.fillStyle=this.color+'0.8)';
-      ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(this.symbol,0,0);
-    }
-    ctx.restore();
-  }
-}
-const particles = Array.from({length:45},()=>new Particle());
+// Canvas
+const canvas=document.getElementById('petals-canvas'),ctx=canvas.getContext('2d');
+let W=canvas.width=window.innerWidth,H=canvas.height=window.innerHeight;
+window.addEventListener('resize',()=>{W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;});
+let mouse={x:W/2,y:H/2};
+document.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;});
+const colors=['rgba(232,180,173,','rgba(201,132,122,','rgba(201,169,110,','rgba(138,159,138,'];
+const symbols=['♡','✉','✦','❀','✿'];
+class P{constructor(){this.reset(true);}reset(i){this.x=Math.random()*W;this.y=i?Math.random()*H:-30;this.size=Math.random()*6+2;this.speedY=Math.random()*0.5+0.2;this.speedX=(Math.random()-0.5)*0.3;this.opacity=Math.random()*0.35+0.1;this.rotation=Math.random()*Math.PI*2;this.rotSpeed=(Math.random()-0.5)*0.015;this.type=Math.random()<0.65?'petal':'symbol';this.color=colors[Math.floor(Math.random()*colors.length)];this.symbol=symbols[Math.floor(Math.random()*symbols.length)];this.wobble=Math.random()*Math.PI*2;this.wobbleSpeed=Math.random()*0.015+0.004;}update(){this.wobble+=this.wobbleSpeed;this.x+=this.speedX+Math.sin(this.wobble)*0.3;this.y+=this.speedY;this.rotation+=this.rotSpeed;const dx=this.x-mouse.x,dy=this.y-mouse.y,d=Math.sqrt(dx*dx+dy*dy);if(d<70){this.x+=dx/d*0.5;this.y+=dy/d*0.5;}if(this.y>H+30)this.reset(false);}draw(){ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.rotation);ctx.globalAlpha=this.opacity;if(this.type==='petal'){ctx.fillStyle=this.color+'1)';ctx.beginPath();ctx.ellipse(0,0,this.size,this.size*1.6,0,0,Math.PI*2);ctx.fill();}else{ctx.font=`${this.size*1.8}px serif`;ctx.fillStyle=this.color+'0.8)';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(this.symbol,0,0);}ctx.restore();}}
+const particles=Array.from({length:45},()=>new P());
 function animate(){ctx.clearRect(0,0,W,H);particles.forEach(p=>{p.update();p.draw();});requestAnimationFrame(animate);}
 animate();
 </script>
