@@ -1,189 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CipherGiftyy — Something bloomed for you 🌸</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IM+Fell+English:ital@0;1&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet"/>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-html,body{min-height:100vh;font-family:'Lora',serif;cursor:none;overflow:hidden;}
-.cursor{width:10px;height:10px;border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply;transition:background 0.3s;}
-.cursor-ring{width:30px;height:30px;border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:left 0.1s,top 0.1s,border-color 0.3s;}
-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;}
-#bg{position:fixed;inset:0;z-index:0;transition:background 1s ease;}
-
-/* PHASES */
-.phase{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.8s ease;}
-.phase.visible{opacity:1;pointer-events:all;}
-
-/* PHASE 1 — BLANK + HINT */
-.tap-hint{font-family:'Lora',serif;font-style:italic;font-size:1rem;letter-spacing:0.18em;animation:gentlePulse 2s ease infinite;text-align:center;padding:0 2rem;}
-@keyframes gentlePulse{0%,100%{opacity:0.4;transform:scale(1);}50%{opacity:1;transform:scale(1.03);}}
-
-/* PHASE 3 — MESSAGE */
-.message-wrap{padding:2rem;width:100%;max-width:560px;animation:floatUp 1.2s ease both;}
-@keyframes floatUp{from{transform:translateY(40px);opacity:0;}to{transform:translateY(0);opacity:1;}}
-.message-paper{
-  background:rgba(255,255,255,0.88);
-  backdrop-filter:blur(16px);
-  border-radius:12px;
-  padding:3rem 2.5rem;
-  box-shadow:0 24px 80px rgba(0,0,0,0.12);
-  position:relative;
-  border:1px solid rgba(255,255,255,0.6);
-}
-.message-paper::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:60%;height:2.5px;border-radius:0 0 4px 4px;}
-.message-dear{font-family:'IM Fell English',serif;font-size:1.15rem;font-style:italic;display:block;margin-bottom:1rem;}
-.thin-rule{width:50%;height:1px;margin:1.2rem auto;opacity:0.4;}
-.message-body{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:italic;line-height:2.1;white-space:pre-line;margin-bottom:1.2rem;}
-.message-from{font-family:'Lora',serif;font-style:italic;font-size:0.8rem;text-align:right;display:block;opacity:0.8;}
-.ciphergiftyy-tag{margin-top:1.5rem;text-align:center;font-family:'Lora',serif;font-style:italic;font-size:0.65rem;letter-spacing:0.15em;opacity:0.5;}
-.ciphergiftyy-tag a{text-decoration:none;color:inherit;}
-</style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CipherGiftyy — Something bloomed for you 🌸</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IM+Fell+English:ital@0;1&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    html,body{min-height:100vh;font-family:'Lora',serif;cursor:none;overflow:hidden;}
+    .cursor{width:10px;height:10px;border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply;transition:background 0.3s;}
+    .cursor-ring{width:30px;height:30px;border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:left 0.1s,top 0.1s,border-color 0.3s;}
+    canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;}
+    #bg{position:fixed;inset:0;z-index:0;transition:background 1s ease;}
+    
+    /* PHASES */
+    .phase{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.8s ease;}
+    .phase.visible{opacity:1;pointer-events:all;}
+    
+    /* PHASE 1 — BLANK + HINT */
+    .tap-hint{font-family:'Lora',serif;font-style:italic;font-size:1rem;letter-spacing:0.18em;animation:gentlePulse 2s ease infinite;text-align:center;padding:0 2rem;}
+    @keyframes gentlePulse{0%,100%{opacity:0.4;transform:scale(1);}50%{opacity:1;transform:scale(1.03);}}
+    
+    /* PHASE 3 — MESSAGE */
+    .message-wrap{padding:2rem;width:100%;max-width:560px;animation:floatUp 1.2s ease both;}
+    @keyframes floatUp{from{transform:translateY(40px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+    .message-paper{background:rgba(255,255,255,0.88); backdrop-filter:blur(16px); border-radius:12px; padding:3rem 2.5rem; box-shadow:0 24px 80px rgba(0,0,0,0.12); position:relative; border:1px solid rgba(255,255,255,0.6); }
+    .message-paper::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:60%;height:2.5px;border-radius:0 0 4px 4px;}
+    .message-dear{font-family:'IM Fell English',serif;font-size:1.15rem;font-style:italic;display:block;margin-bottom:1rem;}
+    .thin-rule{width:50%;height:1px;margin:1.2rem auto;opacity:0.4;}
+    .message-body{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:italic;line-height:2.1;white-space:pre-line;margin-bottom:1.2rem;}
+    .message-from{font-family:'Lora',serif;font-style:italic;font-size:0.8rem;text-align:right;display:block;opacity:0.8;}
+    .ciphergiftyy-tag{margin-top:1.5rem;text-align:center;font-family:'Lora',serif;font-style:italic;font-size:0.65rem;letter-spacing:0.15em;opacity:0.5;}
+    .ciphergiftyy-tag a{text-decoration:none;color:inherit;}
+  </style>
 </head>
 <body>
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursor-ring"></div>
-<div id="bg"></div>
-<canvas id="bloom-canvas"></canvas>
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursor-ring"></div>
+  <div id="bg"></div>
+  <canvas id="bloom-canvas"></canvas>
 
-<!-- PHASE 1: BLANK + TAP -->
-<div class="phase visible" id="phase1">
-  <div class="tap-hint" id="tap-hint">✦ &nbsp;tap to bloom&nbsp; ✦</div>
-</div>
-
-<!-- PHASE 3: MESSAGE -->
-<div class="phase" id="phase3">
-  <div class="message-wrap">
-    <div class="message-paper">
-      <span class="message-dear" id="reveal-dear"></span>
-      <div class="thin-rule" id="thin-rule1"></div>
-      <div class="message-body" id="reveal-body"></div>
-      <div class="thin-rule" id="thin-rule2"></div>
-      <span class="message-from" id="reveal-from"></span>
-    </div>
-    <div class="ciphergiftyy-tag">made with love on <a href="index.html">CipherGiftyy</a> 🌸</div>
+  <div class="phase visible" id="phase1">
+    <div class="tap-hint" id="tap-hint">✦ &nbsp;tap to bloom&nbsp; ✦</div>
   </div>
-</div>
 
-<script>
-const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
-document.addEventListener('mousemove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px';setTimeout(()=>{ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px';},80);});
+  <div class="phase" id="phase3">
+    <div class="message-wrap">
+      <div class="message-paper">
+        <span class="message-dear" id="reveal-dear"></span>
+        <div class="thin-rule" id="thin-rule1"></div>
+        <div class="message-body" id="reveal-body"></div>
+        <div class="thin-rule" id="thin-rule2"></div>
+        <span class="message-from" id="reveal-from"></span>
+      </div>
+      <div class="ciphergiftyy-tag">made with love on <a href="index.html">CipherGiftyy</a> 🌸</div>
+    </div>
+  </div>
 
-const themes={
-  love:{bg:'#FFF0F3',accent:'#E8547A',text:'#3D1A24',cursor:'#E8547A',petals:['rgba(232,84,122,','rgba(255,143,171,','rgba(255,192,203,'],symbols:['🌹','❤️','💕','🌸','💗'],rule:'rgba(232,84,122,0.4)'},
-  missing:{bg:'#EEF4FF',accent:'#4A7FCB',text:'#0D1B3E',cursor:'#4A7FCB',petals:['rgba(74,127,203,','rgba(123,167,232,','rgba(173,210,255,'],symbols:['🌙','⭐','💙','🌟','✨'],rule:'rgba(74,127,203,0.4)'},
-  cute:{bg:'#FFF8FC',accent:'#FF8ED4',text:'#3D1535',cursor:'#FF8ED4',petals:['rgba(255,142,212,','rgba(255,179,230,','rgba(255,218,247,'],symbols:['🐼','⭐','🌸','✨','💕'],rule:'rgba(255,142,212,0.4)'}
-};
+  <script>
+    const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+    document.addEventListener('mousemove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px';setTimeout(()=>{ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px';},80);});
 
-// Read data from URL
-const params=new URLSearchParams(window.location.search);
-const encoded=params.get('data');
-let data={theme:'love',name:'My Love',body:'No message found. 🌸',from:''};
-if(encoded){try{data=JSON.parse(decodeURIComponent(escape(atob(encoded))));}catch(e){}}
+    const themes={
+      love:{bg:'#FFF0F3',accent:'#E8547A',text:'#3D1A24',cursor:'#E8547A',petals:['rgba(232,84,122,1)','rgba(255,143,171,1)','rgba(255,192,203,1)'],symbols:['🌹','❤️','💕','🌸','💗'],rule:'rgba(232,84,122,0.4)'},
+      missing:{bg:'#EEF4FF',accent:'#4A7FCB',text:'#0D1B3E',cursor:'#4A7FCB',petals:['rgba(74,127,203,1)','rgba(123,167,232,1)','rgba(173,210,255,1)'],symbols:['🌙','⭐','💙','🌟','✨'],rule:'rgba(74,127,203,0.4)'},
+      cute:{bg:'#FFF8FC',accent:'#FF8ED4',text:'#3D1535',cursor:'#FF8ED4',petals:['rgba(255,142,212,1)','rgba(255,179,230,1)','rgba(255,218,247,1)'],symbols:['🐼','⭐','🌸','✨','💕'],rule:'rgba(255,142,212,0.4)'}
+    };
 
-const th=themes[data.theme]||themes.love;
+    // Read data from URL
+    const params=new URLSearchParams(window.location.search);
+    const encoded=params.get('data');
+    let data={theme:'love',name:'My Love',body:'No message found. 🌸',from:''};
+    if(encoded){try{data=JSON.parse(decodeURIComponent(escape(atob(encoded))));}catch(e){}}
+    const th=themes[data.theme]||themes.love;
 
-// Apply theme
-document.getElementById('bg').style.background=th.bg;
-document.querySelector('.tap-hint').style.color=th.accent;
-document.getElementById('reveal-dear').style.color=th.accent;
-document.getElementById('reveal-dear').textContent='Dear '+data.name+',';
-document.getElementById('reveal-body').textContent=data.body;
-document.getElementById('reveal-body').style.color=th.text;
-document.getElementById('reveal-from').textContent=data.from?'With love, '+data.from:'With love 🌸';
-document.getElementById('reveal-from').style.color=th.accent;
-document.querySelector('.message-paper::before');
-document.getElementById('thin-rule1').style.background=th.rule;
-document.getElementById('thin-rule2').style.background=th.rule;
-document.querySelector('.message-paper').style.borderColor='rgba(255,255,255,0.6)';
-document.querySelector('.message-paper').querySelector('.message-paper::before');
-cursor.style.background=th.cursor;
-ring.style.borderColor=th.accent;
+    // Apply theme
+    document.getElementById('bg').style.background=th.bg;
+    document.querySelector('.tap-hint').style.color=th.accent;
+    document.getElementById('reveal-dear').style.color=th.accent;
+    document.getElementById('reveal-dear').textContent='Dear '+data.name+',';
+    document.getElementById('reveal-body').textContent=data.body;
+    document.getElementById('reveal-body').style.color=th.text;
+    document.getElementById('reveal-from').textContent=data.from?'With love, '+data.from:'With love 🌸';
+    document.getElementById('reveal-from').style.color=th.accent;
+    document.getElementById('thin-rule1').style.background=th.rule;
+    document.getElementById('thin-rule2').style.background=th.rule;
+    document.querySelector('.message-paper').style.borderColor='rgba(255,255,255,0.6)';
+    cursor.style.background=th.cursor;
+    ring.style.borderColor=th.accent;
 
-// Bloom canvas
-const canvas=document.getElementById('bloom-canvas');
-const ctx=canvas.getContext('2d');
-let W=canvas.width=window.innerWidth,H=canvas.height=window.innerHeight;
-window.addEventListener('resize',()=>{W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;});
+    // Bloom canvas
+    const canvas=document.getElementById('bloom-canvas');
+    const ctx=canvas.getContext('2d');
+    let W=canvas.width=window.innerWidth,H=canvas.height=window.innerHeight;
+    window.addEventListener('resize',()=>{W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;});
+    let particles=[],phase=1,animFrame;
 
-let particles=[],phase=1,animFrame;
+    class Petal{
+      constructor(){
+        const cx=W/2,cy=H/2;
+        const angle=Math.random()*Math.PI*2;
+        const dist=Math.random()*80;
+        this.x=cx+Math.cos(angle)*dist;
+        this.y=cy+Math.sin(angle)*dist;
+        this.tx=Math.random()*W;
+        this.ty=Math.random()*H;
+        this.size=Math.random()*20+8;
+        this.opacity=0;
+        this.targetOpacity=Math.random()*0.75+0.25;
+        this.rotation=Math.random()*Math.PI*2;
+        this.rotSpeed=(Math.random()-0.5)*0.025;
+        this.color=th.petals[Math.floor(Math.random()*th.petals.length)];
+        this.useEmoji=Math.random()<0.28;
+        this.emoji=th.symbols[Math.floor(Math.random()*th.symbols.length)];
+        this.vx=(this.tx-this.x)*0.04;
+        this.vy=(this.ty-this.y)*0.04;
+        this.fading=false;
+        this.wobble=Math.random()*Math.PI*2;
+      }
+      update(){
+        this.wobble+=0.025;
+        this.x+=this.vx+(this.fading?this.vx*0.5:0);
+        this.y+=this.vy+(this.fading?this.vy*0.5:0);
+        this.x+=Math.sin(this.wobble)*0.5;
+        this.rotation+=this.rotSpeed;
+        if(this.fading){this.opacity-=0.02;}
+        else{this.opacity=Math.min(this.opacity+0.04,this.targetOpacity);}
+      }
+      draw(){
+        ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.rotation);ctx.globalAlpha=Math.max(0,this.opacity);
+        if(this.useEmoji){
+          ctx.font=this.size+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(this.emoji,0,0);
+        }else{
+          ctx.fillStyle=this.color;ctx.beginPath();ctx.ellipse(0,0,this.size*0.4,this.size,0,0,Math.PI*2);ctx.fill();
+        }
+        ctx.restore();
+      }
+    }
 
-class Petal{
-  constructor(){
-    const cx=W/2,cy=H/2;
-    const angle=Math.random()*Math.PI*2;
-    const dist=Math.random()*80;
-    this.x=cx+Math.cos(angle)*dist;
-    this.y=cy+Math.sin(angle)*dist;
-    this.tx=Math.random()*W;
-    this.ty=Math.random()*H;
-    this.size=Math.random()*20+8;
-    this.opacity=0;
-    this.targetOpacity=Math.random()*0.75+0.25;
-    this.rotation=Math.random()*Math.PI*2;
-    this.rotSpeed=(Math.random()-0.5)*0.025;
-    this.color=th.petals[Math.floor(Math.random()*th.petals.length)];
-    this.useEmoji=Math.random()<0.28;
-    this.emoji=th.symbols[Math.floor(Math.random()*th.symbols.length)];
-    this.vx=(this.tx-this.x)*0.04;
-    this.vy=(this.ty-this.y)*0.04;
-    this.fading=false;
-    this.wobble=Math.random()*Math.PI*2;
-  }
-  update(){
-    this.wobble+=0.025;
-    this.x+=this.vx+(this.fading?this.vx*0.5:0);
-    this.y+=this.vy+(this.fading?this.vy*0.5:0);
-    this.x+=Math.sin(this.wobble)*0.5;
-    this.rotation+=this.rotSpeed;
-    if(this.fading){this.opacity-=0.02;}
-    else{this.opacity=Math.min(this.opacity+0.04,this.targetOpacity);}
-  }
-  draw(){
-    ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.rotation);ctx.globalAlpha=Math.max(0,this.opacity);
-    if(this.useEmoji){ctx.font=this.size+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(this.emoji,0,0);}
-    else{ctx.fillStyle=this.color+'1)';ctx.beginPath();ctx.ellipse(0,0,this.size*0.4,this.size,0,0,Math.PI*2);ctx.fill();}
-    ctx.restore();
-  }
-}
+    function spawnFlowers(){for(let i=0;i<140;i++){setTimeout(()=>{particles.push(new Petal());},i*15);}}
+    function animate(){
+      ctx.clearRect(0,0,W,H);
+      particles=particles.filter(p=>p.opacity>0||!p.fading);
+      particles.forEach(p=>{p.update();p.draw();});
+      animFrame=requestAnimationFrame(animate);
+    }
+    animate();
 
-function spawnFlowers(){
-  for(let i=0;i<140;i++){setTimeout(()=>{particles.push(new Petal());},i*15);}
-}
-
-function animate(){
-  ctx.clearRect(0,0,W,H);
-  particles=particles.filter(p=>p.opacity>0||!p.fading);
-  particles.forEach(p=>{p.update();p.draw();});
-  animFrame=requestAnimationFrame(animate);
-}
-animate();
-
-// TAP HANDLER
-document.addEventListener('click',function(){
-  if(phase===1){
-    phase=2;
-    spawnFlowers();
-    document.getElementById('phase1').classList.remove('visible');
-    setTimeout(()=>{
-      particles.forEach(p=>p.fading=true);
-      document.getElementById('phase3').classList.add('visible');
-    },2400);
-  }
-});
-document.addEventListener('touchstart',function(){
-  if(phase===1){
-    phase=2;
-    spawnFlowers();
-    document.getElementById('phase1').classList.remove('visible');
-    setTimeout(()=>{
-      particles.forEach(p=>p.fading=true);
-      document.getElementById('phase3').classList.add('visible');
-    },2400);
-  }
-});
-</script>
+    // TAP HANDLER
+    function handleTap(){
+      if(phase===1){
+        phase=2;
+        spawnFlowers();
+        document.getElementById('phase1').classList.remove('visible');
+        setTimeout(()=>{
+          particles.forEach(p=>p.fading=true);
+          document.getElementById('phase3').classList.add('visible');
+        },2400);
+      }
+    }
+    document.addEventListener('click',handleTap);
+    document.addEventListener('touchstart',handleTap);
+  </script>
 </body>
 </html>
