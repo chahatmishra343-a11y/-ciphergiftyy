@@ -3,197 +3,71 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CipherGiftyy — Music Corner</title>
+<title>CipherGiftyy — A Song For You 🎵</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IM+Fell+English:ital@0;1&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet"/>
 <style>
-:root{--ivory:#FAF8F5;--linen:#F3EFE8;--ink:#2C2523;--sepia:#5C3D2E;--rose:#C9847A;--gold:#C9A96E;--gold-light:#E8D5A3;--sage:#8A9F8A;}
+:root{--ivory:#FFF9F4;--ink:#2C2523;--sepia:#5C3D2E;--gold:#D4A85A;}
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{min-height:100vh;background:var(--ivory);font-family:'Lora',serif;color:var(--ink);cursor:none;overflow-x:hidden;}
-.cursor{width:10px;height:10px;border-radius:50%;background:var(--rose);position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply;}
-.cursor-ring{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--gold);position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);}
-#petals-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+html,body{min-height:100vh;font-family:'Lora',serif;color:var(--ink);cursor:none;overflow:hidden;transition:background 0.6s ease;background:#FFF0F3;}
+.cursor{width:10px;height:10px;border-radius:50%;background:#E8547A;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply;}
+.cursor-ring{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--gold);position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);}
+canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;}
 
-header{position:relative;z-index:10;padding:1.5rem 2.5rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(201,169,110,0.2);}
-.back-home{font-style:italic;font-size:0.75rem;letter-spacing:0.12em;color:var(--gold);text-decoration:none;}
-.logo{font-family:'IM Fell English',serif;font-size:1.1rem;color:var(--ink);}
-.logo span{color:var(--gold);}
-.header-tag{font-style:italic;font-size:0.7rem;color:var(--sepia);}
+.stage{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;padding:2rem;overflow-y:auto;}
 
-.screen{display:none;position:relative;z-index:10;}
-.screen.active{display:block;}
-
-.composer{max-width:680px;margin:0 auto;padding:3rem 2rem 5rem;animation:fadeUp 0.8s ease both;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
-.section-label{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1rem;}
-.section-label::before,.section-label::after{content:'';display:inline-block;width:40px;height:1px;background:var(--gold-light);}
-.page-title{font-family:'IM Fell English',serif;font-size:2.2rem;font-style:italic;text-align:center;margin-bottom:0.5rem;}
-.page-sub{font-style:italic;font-size:0.82rem;color:var(--sepia);text-align:center;line-height:1.8;margin-bottom:2.5rem;}
-
-.field-group{margin-bottom:2rem;}
-.field-label{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.8rem;display:block;}
-.field-input,.field-textarea{width:100%;background:var(--linen);border:1px solid rgba(201,169,110,0.3);border-radius:6px;padding:0.9rem 1.2rem;font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic;color:var(--sepia);outline:none;cursor:text;transition:border-color 0.3s;}
-.field-input:focus,.field-textarea:focus{border-color:var(--gold);}
-.field-textarea{min-height:90px;resize:none;line-height:1.8;}
-.field-hint{font-size:0.65rem;font-style:italic;color:var(--sepia);margin-top:0.5rem;display:block;}
-
-/* CHAMBER PICKER */
-.chamber-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;}
-.chamber-card{border:2px solid rgba(201,169,110,0.2);border-radius:10px;padding:1.4rem 1.2rem;cursor:none;transition:all 0.3s;background:var(--linen);position:relative;}
-.chamber-card:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,0.06);}
-.chamber-card.selected{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,169,110,0.18);}
-.check-badge{position:absolute;top:0.6rem;right:0.6rem;width:18px;height:18px;border-radius:50%;background:var(--gold);color:white;font-size:0.6rem;display:none;align-items:center;justify-content:center;}
-.chamber-card.selected .check-badge{display:flex;}
-.chamber-icon{font-size:1.8rem;margin-bottom:0.5rem;}
-.chamber-name{font-family:'IM Fell English',serif;font-size:1rem;font-style:italic;margin-bottom:0.3rem;}
-.chamber-desc{font-size:0.7rem;color:var(--sepia);font-style:italic;line-height:1.6;}
-
-/* THEME PICKER */
-.theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
-.theme-card{border:2px solid rgba(201,169,110,0.2);border-radius:10px;padding:1.2rem 0.8rem;cursor:none;transition:all 0.3s;text-align:center;position:relative;}
-.theme-card:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,0.06);}
-.theme-card.selected{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,169,110,0.18);}
-.theme-card.selected .check-badge{display:flex;}
-.theme-petals{background:linear-gradient(135deg,#FFF0F3,#FFD6E2);}
-.theme-snow{background:linear-gradient(135deg,#EEF6FF,#D6ECFF);}
-.theme-stars{background:linear-gradient(135deg,#2A2440,#3D3560);color:#F4EFE8;}
-.theme-stars .theme-name,.theme-stars .theme-vibe{color:#F4EFE8;}
-.theme-emoji{font-size:1.8rem;margin-bottom:0.4rem;}
-.theme-name{font-family:'IM Fell English',serif;font-size:0.9rem;font-style:italic;}
-.theme-vibe{font-size:0.65rem;color:var(--sepia);margin-top:0.2rem;font-style:italic;}
-
-.deckle{width:100%;height:6px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='6'%3E%3Cpath d='M0 6 Q5 0 10 6 Q15 0 20 6 Q25 0 30 6 Q35 0 40 6' fill='none' stroke='%23C9A96E' stroke-width='0.8' stroke-opacity='0.35'/%3E%3C/svg%3E") repeat-x center;margin:1.5rem 0;}
-.btn-create{width:100%;padding:1rem;background:var(--ink);color:var(--ivory);font-size:0.75rem;letter-spacing:0.18em;text-transform:uppercase;border:none;border-radius:6px;cursor:none;transition:all 0.3s;}
-.btn-create:hover{background:var(--sepia);transform:translateY(-2px);}
-
-/* SHARE */
-.share-wrap{max-width:500px;margin:0 auto;padding:4rem 2rem;text-align:center;animation:fadeUp 0.8s ease both;}
-.share-icon{font-size:3rem;margin-bottom:1.5rem;}
-.share-title{font-family:'IM Fell English',serif;font-size:1.8rem;font-style:italic;margin-bottom:0.8rem;}
-.share-sub{font-style:italic;font-size:0.8rem;color:var(--sepia);line-height:1.8;margin-bottom:2rem;}
-.link-box{background:var(--linen);border:1px solid rgba(201,169,110,0.4);border-radius:6px;padding:1rem 1.4rem;font-size:0.72rem;color:var(--sepia);margin-bottom:1.5rem;word-break:break-all;cursor:none;transition:border-color 0.3s;}
-.link-box:hover{border-color:var(--gold);}
-.share-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
-.btn-copy,.btn-outline{padding:0.8rem 2rem;font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;border-radius:4px;cursor:none;transition:all 0.3s;}
-.btn-copy{background:var(--ink);color:var(--ivory);border:none;}
-.btn-copy:hover{background:var(--sepia);}
-.btn-outline{background:transparent;color:var(--sepia);border:1px solid rgba(201,169,110,0.5);}
-.btn-outline:hover{border-color:var(--gold);color:var(--ink);}
-.copied-msg{margin-top:1rem;font-style:italic;font-size:0.68rem;color:var(--sage);display:none;}
-
-.hidden-field{display:none;}
-
-@media(max-width:600px){
-  .chamber-grid,.theme-grid{grid-template-columns:1fr 1fr;}
-  .composer{padding:2rem 1rem 4rem;}
-  header{padding:1.2rem 1.5rem;flex-direction:column;gap:0.5rem;}
+.card{
+  max-width:480px;width:100%;
+  background:rgba(255,255,255,0.85);
+  backdrop-filter:blur(16px);
+  border-radius:18px;
+  padding:2.6rem 2.2rem;
+  box-shadow:0 24px 70px rgba(0,0,0,0.12);
+  text-align:center;
+  border:1px solid rgba(255,255,255,0.6);
+  animation:floatUp 1.1s ease both;
+  margin:auto;
 }
+@keyframes floatUp{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+
+.card-dear{font-family:'IM Fell English',serif;font-size:1.25rem;font-style:italic;margin-bottom:0.6rem;display:block;}
+.card-tagline{font-style:italic;font-size:0.8rem;color:var(--sepia);margin-bottom:1.4rem;line-height:1.7;}
+.card-rule{width:50%;height:1px;margin:1rem auto;background:rgba(212,168,90,0.4);}
+
+.pic-frame{width:100%;border-radius:14px;overflow:hidden;margin-bottom:1.4rem;box-shadow:0 8px 30px rgba(0,0,0,0.1);position:relative;max-height:320px;}
+.pic-frame img{width:100%;display:block;object-fit:cover;max-height:320px;}
+.pic-frame::after{content:'';position:absolute;inset:0;border-radius:14px;border:3px solid rgba(255,255,255,0.4);pointer-events:none;}
+
+.embed-wrap{width:100%;border-radius:14px;overflow:hidden;margin-bottom:1.2rem;box-shadow:0 8px 30px rgba(0,0,0,0.08);}
+.embed-wrap iframe{display:block;width:100%;border:none;}
+
+.note-body{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:italic;line-height:2;color:var(--ink);white-space:pre-line;margin-top:1rem;}
+.card-tag{margin-top:1.4rem;font-style:italic;font-size:0.66rem;letter-spacing:0.12em;color:var(--gold);}
+.card-tag a{color:inherit;text-decoration:none;}
+.fallback-link{display:inline-block;padding:0.9rem 1.8rem;background:#2C2523;color:#FFF9F4;border-radius:10px;text-decoration:none;font-style:italic;font-size:0.85rem;margin-bottom:1rem;transition:transform 0.3s;}
+.fallback-link:hover{transform:translateY(-2px);}
+
+@media(max-width:480px){.card{padding:2rem 1.4rem;}}
 </style>
 </head>
 <body>
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursor-ring"></div>
-<canvas id="petals-canvas"></canvas>
+<canvas id="theme-canvas"></canvas>
 
-<header>
-  <a href="index.html" class="back-home">← Return to the Garden</a>
-  <div class="logo">✦ Cipher<span>Giftyy</span></div>
-  <div class="header-tag">The Music Corner 🎵</div>
-</header>
+<div class="stage">
+  <div class="card" id="card">
+    <span class="card-dear" id="card-dear"></span>
+    <div class="card-tagline">This song reminds me of you 🎵</div>
+    <div class="card-rule"></div>
 
-<!-- SCREEN 1: COMPOSER -->
-<div class="screen active" id="screen-composer">
-  <div class="composer">
-    <div class="section-label">Music Corner</div>
-    <div class="page-title">Send them a song.</div>
-    <div class="page-sub">A voice note, a song link, or a picture — wrapped in falling petals, snow, or stars. They open it, press play, and feel everything you wanted to say.</div>
-
-    <!-- CHAMBER -->
-    <div class="field-group">
-      <span class="field-label">✦ Choose Your Chamber</span>
-      <div class="chamber-grid">
-        <div class="chamber-card selected" id="ch-anim" onclick="pickChamber('anim')">
-          <div class="check-badge">✓</div>
-          <div class="chamber-icon">🎤</div>
-          <div class="chamber-name">Voice Note + Animation</div>
-          <div class="chamber-desc">A song or voice note plays over a beautiful animated background.</div>
-        </div>
-        <div class="chamber-card" id="ch-pic" onclick="pickChamber('pic')">
-          <div class="check-badge">✓</div>
-          <div class="chamber-icon">📸</div>
-          <div class="chamber-name">Voice Note + Picture</div>
-          <div class="chamber-desc">A song plays over a picture of your beloved, with gentle animation.</div>
-        </div>
-      </div>
+    <div class="pic-frame" id="pic-frame" style="display:none;">
+      <img id="card-pic" src="" alt="A picture of you"/>
     </div>
 
-    <!-- THEME -->
-    <div class="field-group">
-      <span class="field-label">✦ Choose Your Animation Theme</span>
-      <div class="theme-grid">
-        <div class="theme-card theme-petals selected" id="tc-petals" onclick="pickTheme('petals')">
-          <div class="check-badge">✓</div>
-          <div class="theme-emoji">🌸</div>
-          <div class="theme-name">Falling Petals</div>
-          <div class="theme-vibe">Warm pink & rose</div>
-        </div>
-        <div class="theme-card theme-snow" id="tc-snow" onclick="pickTheme('snow')">
-          <div class="check-badge">✓</div>
-          <div class="theme-emoji">❄️</div>
-          <div class="theme-name">Falling Snow</div>
-          <div class="theme-vibe">Soft blue & white</div>
-        </div>
-        <div class="theme-card theme-stars" id="tc-stars" onclick="pickTheme('stars')">
-          <div class="check-badge">✓</div>
-          <div class="theme-emoji">⭐</div>
-          <div class="theme-name">Falling Stars</div>
-          <div class="theme-vibe">Night sky & violet</div>
-        </div>
-      </div>
-    </div>
+    <div class="embed-wrap" id="embed-wrap"></div>
 
-    <!-- PICTURE URL (shown only for pic chamber) -->
-    <div class="field-group hidden-field" id="field-picture">
-      <label class="field-label">✦ Picture Link</label>
-      <input class="field-input" id="inp-picture" type="text" placeholder="Paste an image link (from Google Drive, Imgur, etc.)"/>
-      <span class="field-hint">Tip: Upload your photo to a free image host like imgur.com and paste the direct image link here.</span>
-    </div>
-
-    <!-- SONG LINK -->
-    <div class="field-group">
-      <label class="field-label">✦ Song Link</label>
-      <input class="field-input" id="inp-song" type="text" placeholder="Paste a Spotify or YouTube link..."/>
-      <span class="field-hint">Spotify track link or YouTube video link — both work beautifully here.</span>
-    </div>
-
-    <!-- NAME -->
-    <div class="field-group">
-      <label class="field-label">✦ Their Name</label>
-      <input class="field-input" id="inp-name" type="text" placeholder="Sarah, Rohan, My Love..."/>
-    </div>
-
-    <!-- NOTE -->
-    <div class="field-group">
-      <label class="field-label">✦ This Song Reminds Me Of You</label>
-      <textarea class="field-textarea" id="inp-note" placeholder="Write a small note about why this song reminds you of them..."></textarea>
-    </div>
-
-    <div class="deckle"></div>
-    <button class="btn-create" onclick="createMusic()">Send This Song ✦</button>
-  </div>
-</div>
-
-<!-- SCREEN 2: SHARE -->
-<div class="screen" id="screen-share">
-  <div class="share-wrap">
-    <div class="share-icon">🎵</div>
-    <div class="share-title">Your song is ready.</div>
-    <div class="share-sub">Send this link to your beloved.<br/>They'll open it, watch the animation bloom, and press play.</div>
-    <div class="link-box" id="link-display" onclick="copyLink()">Click to copy your link ✦</div>
-    <div class="share-btns">
-      <button class="btn-copy" onclick="copyLink()">Copy Link ✦</button>
-      <button class="btn-outline" onclick="goBack()">Make Another</button>
-    </div>
-    <div class="copied-msg" id="copied-msg">✦ Copied! Now send it with love. ✦</div>
+    <div class="note-body" id="note-body"></div>
+    <div class="card-tag">made with love on <a href="index.html">CipherGiftyy</a> 🌸</div>
   </div>
 </div>
 
@@ -201,55 +75,179 @@ header{position:relative;z-index:10;padding:1.5rem 2.5rem;display:flex;justify-c
 const cur=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
 document.addEventListener('mousemove',e=>{cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';setTimeout(()=>{ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px';},80);});
 
-let state={chamber:'anim',theme:'petals'};
-
-function pickChamber(c){
-  state.chamber=c;
-  document.querySelectorAll('.chamber-card').forEach(x=>x.classList.remove('selected'));
-  document.getElementById('ch-'+c).classList.add('selected');
-  document.getElementById('field-picture').classList.toggle('hidden-field',c!=='pic');
-}
-function pickTheme(t){
-  state.theme=t;
-  document.querySelectorAll('.theme-card').forEach(x=>x.classList.remove('selected'));
-  document.getElementById('tc-'+t).classList.add('selected');
-}
-
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
-function goBack(){showScreen('screen-composer');}
-
-function createMusic(){
-  const song=document.getElementById('inp-song').value.trim();
-  const name=document.getElementById('inp-name').value.trim()||'My Love';
-  const note=document.getElementById('inp-note').value.trim();
-  const picture=document.getElementById('inp-picture').value.trim();
-  if(!song){alert('Please paste a song link first 🎵');return;}
-  if(state.chamber==='pic' && !picture){alert('Please paste a picture link, or switch to Voice Note + Animation 🌸');return;}
-  const data={chamber:state.chamber,theme:state.theme,song,name,note,picture};
-  const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-  const link=window.location.origin+'/music-view.html?data='+encoded;
-  document.getElementById('link-display').textContent=link;
-  showScreen('screen-share');
+// ---- ROBUST DATA READING ----
+function getData(){
+  const params=new URLSearchParams(window.location.search);
+  let raw=params.get('data');
+  let result={chamber:'anim',theme:'petals',song:'',name:'My Love',note:'',picture:''};
+  if(!raw)return result;
+  try{
+    // First try: it was encoded with encodeURIComponent(btoa(...))
+    let b64;
+    try{ b64=decodeURIComponent(raw); }catch(e){ b64=raw; }
+    const jsonStr=decodeURIComponent(escape(atob(b64)));
+    const parsed=JSON.parse(jsonStr);
+    return Object.assign(result,parsed);
+  }catch(e){
+    console.warn('Could not parse gift data',e);
+    return result;
+  }
 }
 
-function copyLink(){
-  const link=document.getElementById('link-display').textContent;
-  navigator.clipboard.writeText(link).then(()=>{
-    const m=document.getElementById('copied-msg');
-    m.style.display='block';
-    setTimeout(()=>m.style.display='none',3000);
-  });
+const data=getData();
+
+document.getElementById('card-dear').textContent='Dear '+(data.name||'My Love')+',';
+document.getElementById('note-body').textContent=data.note||'';
+
+// Picture
+if(data.chamber==='pic' && data.picture){
+  document.getElementById('pic-frame').style.display='block';
+  document.getElementById('card-pic').src=data.picture;
 }
 
-// Background petals
-const bgC=document.getElementById('petals-canvas'),bgCtx=bgC.getContext('2d');
-let bgW=bgC.width=window.innerWidth,bgH=bgC.height=window.innerHeight;
-window.addEventListener('resize',()=>{bgW=bgC.width=window.innerWidth;bgH=bgC.height=window.innerHeight;});
-const bgColors=['rgba(232,180,173,','rgba(201,132,122,','rgba(201,169,110,','rgba(138,159,138,'];
-class BGP{constructor(){this.r(true);}r(i){this.x=Math.random()*bgW;this.y=i?Math.random()*bgH:-20;this.s=Math.random()*5+2;this.sy=Math.random()*0.35+0.12;this.sx=(Math.random()-0.5)*0.2;this.op=Math.random()*0.22+0.06;this.rot=Math.random()*Math.PI*2;this.rs=(Math.random()-0.5)*0.01;this.c=bgColors[Math.floor(Math.random()*bgColors.length)];this.w=Math.random()*Math.PI*2;this.ws=Math.random()*0.01+0.003;}u(){this.w+=this.ws;this.x+=this.sx+Math.sin(this.w)*0.2;this.y+=this.sy;this.rot+=this.rs;if(this.y>bgH+15)this.r(false);}d(){bgCtx.save();bgCtx.translate(this.x,this.y);bgCtx.rotate(this.rot);bgCtx.globalAlpha=this.op;bgCtx.fillStyle=this.c+'1)';bgCtx.beginPath();bgCtx.ellipse(0,0,this.s,this.s*1.6,0,0,Math.PI*2);bgCtx.fill();bgCtx.restore();}}
-const bgPs=Array.from({length:28},()=>new BGP());
-function bgLoop(){bgCtx.clearRect(0,0,bgW,bgH);bgPs.forEach(p=>{p.u();p.d();});requestAnimationFrame(bgLoop);}
-bgLoop();
+// Embed song
+const embedWrap=document.getElementById('embed-wrap');
+function buildEmbed(url){
+  if(!url){
+    embedWrap.innerHTML='<p style="font-style:italic;color:#5C3D2E;font-size:0.85rem;">No song link was added. 🌸</p>';
+    return;
+  }
+  let m=url.match(/open\.spotify\.com\/(track|playlist|album)\/([a-zA-Z0-9]+)/);
+  if(m){
+    const iframe=document.createElement('iframe');
+    iframe.src='https://open.spotify.com/embed/'+m[1]+'/'+m[2];
+    iframe.height='152';
+    iframe.allow='autoplay; encrypted-media';
+    iframe.loading='lazy';
+    embedWrap.appendChild(iframe);
+    return;
+  }
+  m=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]+)/);
+  if(m){
+    const iframe=document.createElement('iframe');
+    iframe.src='https://www.youtube.com/embed/'+m[1]+'?autoplay=0';
+    iframe.height='220';
+    iframe.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+    iframe.allowFullscreen=true;
+    embedWrap.appendChild(iframe);
+    return;
+  }
+  const a=document.createElement('a');
+  a.href=url;a.target='_blank';
+  a.className='fallback-link';
+  a.textContent='♪ Play the song';
+  embedWrap.appendChild(a);
+}
+buildEmbed(data.song);
+
+// THEMES - richer, more saturated colors
+const THEMES={
+  petals:{bg:'linear-gradient(160deg,#FFE0EB,#FFC4D6)',cardBg:'rgba(255,255,255,0.78)',colors:['rgba(232,84,122,','rgba(255,143,171,','rgba(255,192,203,'],symbols:['🌸','🌹','❀','✿'],mode:'fall',textColor:'#2C2523'},
+  snow:{bg:'linear-gradient(160deg,#E3F1FF,#C2E2FF)',cardBg:'rgba(255,255,255,0.8)',colors:['rgba(120,170,230,','rgba(180,215,250,','rgba(255,255,255,'],symbols:['❄️','✦','❅'],mode:'fall',textColor:'#1A2E4A'},
+  stars:{bg:'linear-gradient(160deg,#241B45,#3D2F6B)',cardBg:'rgba(60,50,95,0.55)',colors:['rgba(240,201,90,','rgba(255,255,255,','rgba(200,180,240,'],symbols:['⭐','✨','✦','🌙'],mode:'twinkle',textColor:'#F4EFE8'}
+};
+const th=THEMES[data.theme]||THEMES.petals;
+document.body.style.background=th.bg;
+document.getElementById('card').style.background=th.cardBg;
+document.getElementById('card').style.color=th.textColor;
+document.querySelectorAll('.card-tagline,.note-body').forEach(el=>el.style.color=th.textColor);
+if(data.theme==='stars'){
+  document.querySelector('.card-tag').style.color='#F0C95A';
+  document.querySelector('.card-dear').style.color='#F0C95A';
+}
+
+// CANVAS ANIMATION
+const canvas=document.getElementById('theme-canvas'),ctx=canvas.getContext('2d');
+let W=canvas.width=window.innerWidth,H=canvas.height=window.innerHeight;
+window.addEventListener('resize',()=>{W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;});
+let mouse={x:W/2,y:H/2};
+document.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;});
+
+class FallParticle{
+  constructor(){this.reset(true);}
+  reset(init){
+    this.x=Math.random()*W;
+    this.y=init?Math.random()*H:-20;
+    this.size=Math.random()*16+10;
+    this.speedY=Math.random()*0.6+0.25;
+    this.speedX=(Math.random()-0.5)*0.3;
+    this.opacity=Math.random()*0.7+0.3;
+    this.rotation=Math.random()*Math.PI*2;
+    this.rotSpeed=(Math.random()-0.5)*0.02;
+    this.symbol=th.symbols[Math.floor(Math.random()*th.symbols.length)];
+    this.color=th.colors[Math.floor(Math.random()*th.colors.length)];
+    this.wobble=Math.random()*Math.PI*2;
+    this.wobbleSpeed=Math.random()*0.015+0.004;
+    this.useEmoji=Math.random()<0.75;
+  }
+  update(){
+    this.wobble+=this.wobbleSpeed;
+    this.x+=this.speedX+Math.sin(this.wobble)*0.4;
+    this.y+=this.speedY;
+    this.rotation+=this.rotSpeed;
+    const dx=this.x-mouse.x,dy=this.y-mouse.y,d=Math.sqrt(dx*dx+dy*dy);
+    if(d<80){this.x+=dx/d*0.6;this.y+=dy/d*0.6;}
+    if(this.y>H+20)this.reset(false);
+  }
+  draw(){
+    ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.rotation);ctx.globalAlpha=this.opacity;
+    if(this.useEmoji){
+      ctx.font=this.size+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(this.symbol,0,0);
+    } else {
+      ctx.fillStyle=this.color+'1)';ctx.beginPath();
+      ctx.ellipse(0,0,this.size*0.3,this.size*0.5,0,0,Math.PI*2);ctx.fill();
+    }
+    ctx.restore();
+  }
+}
+
+class TwinkleStar{
+  constructor(){this.reset();}
+  reset(){
+    this.x=Math.random()*W;
+    this.y=Math.random()*H;
+    this.size=Math.random()*3+1.5;
+    this.symbol=th.symbols[Math.floor(Math.random()*th.symbols.length)];
+    this.useEmoji=Math.random()<0.35;
+    this.emojiSize=Math.random()*14+10;
+    this.opacity=Math.random();
+    this.twinkleSpeed=Math.random()*0.03+0.01;
+    this.color=th.colors[Math.floor(Math.random()*th.colors.length)];
+    this.driftY=Math.random()*0.05+0.01;
+  }
+  update(){
+    this.opacity+=this.twinkleSpeed;
+    if(this.opacity>1||this.opacity<0)this.twinkleSpeed*=-1;
+    this.y+=this.driftY;
+    if(this.y>H)this.y=0;
+  }
+  draw(){
+    ctx.save();ctx.globalAlpha=Math.max(0,Math.min(1,this.opacity));
+    if(this.useEmoji){
+      ctx.font=this.emojiSize+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(this.symbol,this.x,this.y);
+    } else {
+      ctx.fillStyle=this.color+'1)';ctx.beginPath();
+      ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fill();
+    }
+    ctx.restore();
+  }
+}
+
+let particles=[];
+if(th.mode==='fall'){
+  particles=Array.from({length:60},()=>new FallParticle());
+} else {
+  particles=Array.from({length:100},()=>new TwinkleStar());
+}
+
+function animate(){
+  ctx.clearRect(0,0,W,H);
+  particles.forEach(p=>{p.update();p.draw();});
+  requestAnimationFrame(animate);
+}
+animate();
 </script>
 </body>
 </html>
