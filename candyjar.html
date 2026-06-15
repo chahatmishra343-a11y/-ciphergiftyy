@@ -5,89 +5,94 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>CipherGiftyy — Candy Jar</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IM+Fell+English:ital@0;1&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-:root{--ivory:#FAF8F5;--linen:#F3EFE8;--ink:#2C2523;--sepia:#5C3D2E;--rose:#C9847A;--gold:#C9A96E;--gold-light:#E8D5A3;--sage:#8A9F8A;}
+:root{--ivory:#FFF9F4;--linen:#FBF1E8;--ink:#2C2523;--sepia:#5C3D2E;--rose:#E8849B;--gold:#D4A85A;--gold-light:#F0D9A8;--sage:#8A9F8A;--pink:#FF9EBB;--pink-deep:#E8547A;}
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{min-height:100vh;background:var(--ivory);font-family:'Lora',serif;color:var(--ink);cursor:none;overflow-x:hidden;}
-.cursor{width:10px;height:10px;border-radius:50%;background:var(--rose);position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply;}
-.cursor-ring{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--gold);position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);}
+.cursor{width:10px;height:10px;border-radius:50%;background:var(--pink-deep);position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply;}
+.cursor-ring{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--gold);position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);}
 #petals-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;}
 
-header{position:relative;z-index:10;padding:1.5rem 2.5rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(201,169,110,0.2);}
+header{position:relative;z-index:10;padding:1.5rem 2.5rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(212,168,90,0.25);background:rgba(255,255,255,0.5);backdrop-filter:blur(6px);}
 .back-home{font-style:italic;font-size:0.75rem;letter-spacing:0.12em;color:var(--gold);text-decoration:none;}
-.logo{font-family:'IM Fell English',serif;font-size:1.1rem;color:var(--ink);}
-.logo span{color:var(--gold);}
+.logo{font-family:'IM Fell English',serif;font-size:1.15rem;color:var(--ink);font-weight:bold;}
+.logo span{color:var(--pink-deep);}
 .header-tag{font-style:italic;font-size:0.7rem;color:var(--sepia);}
 
 .screen{display:none;position:relative;z-index:10;}
 .screen.active{display:block;}
 
-.composer{max-width:680px;margin:0 auto;padding:3rem 2rem 5rem;animation:fadeUp 0.8s ease both;}
+.composer{max-width:700px;margin:0 auto;padding:3rem 2rem 5rem;animation:fadeUp 0.8s ease both;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
-.section-label{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1rem;}
+.section-label{font-size:0.62rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--pink-deep);display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1rem;font-weight:600;}
 .section-label::before,.section-label::after{content:'';display:inline-block;width:40px;height:1px;background:var(--gold-light);}
-.page-title{font-family:'IM Fell English',serif;font-size:2.2rem;font-style:italic;text-align:center;margin-bottom:0.5rem;}
-.page-sub{font-style:italic;font-size:0.82rem;color:var(--sepia);text-align:center;line-height:1.8;margin-bottom:2.5rem;}
+.page-title{font-family:'IM Fell English',serif;font-size:2.4rem;font-style:italic;text-align:center;margin-bottom:0.5rem;color:var(--ink);}
+.page-sub{font-style:italic;font-size:0.84rem;color:var(--sepia);text-align:center;line-height:1.8;margin-bottom:2.5rem;}
 
 .field-group{margin-bottom:2rem;}
-.field-label{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.8rem;display:block;}
-.field-input,.field-textarea{width:100%;background:var(--linen);border:1px solid rgba(201,169,110,0.3);border-radius:6px;padding:0.9rem 1.2rem;font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic;color:var(--sepia);outline:none;cursor:text;transition:border-color 0.3s;}
-.field-input:focus,.field-textarea:focus{border-color:var(--gold);}
+.field-label{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--pink-deep);margin-bottom:0.8rem;display:block;font-weight:600;}
+.field-input,.field-textarea{width:100%;background:white;border:1.5px solid rgba(212,168,90,0.3);border-radius:10px;padding:0.9rem 1.2rem;font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic;color:var(--sepia);outline:none;cursor:text;transition:border-color 0.3s;}
+.field-input:focus,.field-textarea:focus{border-color:var(--pink-deep);}
 .field-textarea{min-height:90px;resize:none;line-height:1.8;}
 
 /* JAR SHAPE PICKER */
 .jar-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
-.jar-card{border:2px solid rgba(201,169,110,0.2);border-radius:10px;padding:1.2rem 0.8rem;cursor:none;transition:all 0.3s;text-align:center;background:var(--linen);position:relative;}
-.jar-card:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,0.06);}
-.jar-card.selected{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,169,110,0.18);}
-.check-badge{position:absolute;top:0.4rem;right:0.4rem;width:16px;height:16px;border-radius:50%;background:var(--gold);color:white;font-size:0.55rem;display:none;align-items:center;justify-content:center;}
+.jar-card{border:2px solid rgba(212,168,90,0.25);border-radius:14px;padding:1.2rem 0.8rem;cursor:none;transition:all 0.3s;text-align:center;background:linear-gradient(160deg,#FFFFFF,#FFF6EF);position:relative;}
+.jar-card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(0,0,0,0.07);}
+.jar-card.selected{border-color:var(--pink-deep);box-shadow:0 0 0 4px rgba(232,84,122,0.15);}
+.check-badge{position:absolute;top:0.5rem;right:0.5rem;width:20px;height:20px;border-radius:50%;background:var(--pink-deep);color:white;font-size:0.65rem;display:none;align-items:center;justify-content:center;font-weight:bold;}
 .jar-card.selected .check-badge{display:flex;}
-.jar-preview{margin:0 auto 0.6rem;width:60px;height:70px;position:relative;}
-.jar-name{font-family:'IM Fell English',serif;font-size:0.85rem;font-style:italic;}
+.jar-preview{margin:0 auto 0.6rem;width:64px;height:74px;position:relative;}
+.jar-name{font-family:'IM Fell English',serif;font-size:0.9rem;font-style:italic;}
 
-/* jar shapes */
-.jp-body{position:absolute;bottom:0;left:50%;transform:translateX(-50%);background:rgba(180,210,230,0.35);border:2px solid rgba(201,169,110,0.5);}
-.jp-round .jp-body{width:54px;height:54px;border-radius:50%;}
-.jp-cylinder .jp-body{width:42px;height:58px;border-radius:8px 8px 14px 14px;}
-.jp-cuboid .jp-body{width:46px;height:54px;border-radius:3px;}
-.jp-neck{position:absolute;top:0;left:50%;transform:translateX(-50%);width:24px;height:10px;background:rgba(201,169,110,0.5);border-radius:3px 3px 0 0;}
+.jp-body{position:absolute;bottom:0;left:50%;transform:translateX(-50%);background:linear-gradient(160deg,rgba(232,84,122,0.12),rgba(255,158,187,0.18));border:2.5px solid var(--gold);}
+.jp-round .jp-body{width:58px;height:58px;border-radius:50%;}
+.jp-cylinder .jp-body{width:44px;height:62px;border-radius:10px 10px 18px 18px;}
+.jp-cuboid .jp-body{width:48px;height:58px;border-radius:4px;}
+.jp-neck{position:absolute;top:0;left:50%;transform:translateX(-50%);width:26px;height:11px;background:var(--gold);border-radius:4px 4px 0 0;}
 
-/* GLASS TEXTURE */
+/* GLASS TOGGLE */
 .toggle-row{display:flex;gap:0.8rem;}
-.toggle-btn{flex:1;padding:0.8rem;border:1.5px solid rgba(201,169,110,0.3);border-radius:6px;background:var(--linen);cursor:none;font-style:italic;font-size:0.78rem;color:var(--sepia);transition:all 0.3s;text-align:center;}
-.toggle-btn.selected{border-color:var(--gold);background:white;color:var(--ink);box-shadow:0 0 0 3px rgba(201,169,110,0.15);}
+.toggle-btn{flex:1;padding:0.9rem;border:1.5px solid rgba(212,168,90,0.3);border-radius:10px;background:white;cursor:none;font-style:italic;font-size:0.8rem;color:var(--sepia);transition:all 0.3s;text-align:center;}
+.toggle-btn.selected{border-color:var(--pink-deep);background:linear-gradient(135deg,#FFF0F4,#FFF8FB);color:var(--ink);box-shadow:0 0 0 4px rgba(232,84,122,0.12);font-weight:600;}
 
 /* CLOTH PICKER */
 .cloth-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.8rem;}
-.cloth-card{border:2px solid rgba(201,169,110,0.2);border-radius:8px;padding:0.6rem;cursor:none;transition:all 0.3s;text-align:center;position:relative;}
-.cloth-card.selected{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,169,110,0.15);}
-.cloth-swatch{width:100%;height:34px;border-radius:5px;margin-bottom:0.4rem;}
-.cloth-name{font-size:0.62rem;font-style:italic;color:var(--sepia);}
+.cloth-card{border:2px solid rgba(212,168,90,0.25);border-radius:10px;padding:0.6rem;cursor:none;transition:all 0.3s;text-align:center;position:relative;background:white;}
+.cloth-card.selected{border-color:var(--pink-deep);box-shadow:0 0 0 4px rgba(232,84,122,0.12);}
+.cloth-swatch{width:100%;height:38px;border-radius:6px;margin-bottom:0.4rem;}
+.cloth-name{font-size:0.64rem;font-style:italic;color:var(--sepia);}
 
-/* CANDY PICKER */
-.candy-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:0.6rem;}
-.candy-chip{border:2px solid rgba(201,169,110,0.2);border-radius:8px;padding:0.7rem 0.3rem;cursor:none;transition:all 0.3s;text-align:center;font-size:1.5rem;background:var(--linen);}
-.candy-chip.selected{border-color:var(--gold);background:white;box-shadow:0 0 0 3px rgba(201,169,110,0.15);}
-.candy-hint{font-size:0.65rem;font-style:italic;color:var(--sepia);margin-top:0.6rem;display:block;}
+/* CANDY PICKER - CSS shapes instead of emoji */
+.candy-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:0.7rem;}
+.candy-chip{border:2px solid rgba(212,168,90,0.25);border-radius:10px;padding:0.8rem 0.3rem;cursor:none;transition:all 0.3s;text-align:center;background:white;display:flex;align-items:center;justify-content:center;height:54px;}
+.candy-chip.selected{border-color:var(--pink-deep);background:linear-gradient(135deg,#FFF0F4,#FFF8FB);box-shadow:0 0 0 4px rgba(232,84,122,0.12);}
+.candy-hint{font-size:0.66rem;font-style:italic;color:var(--sepia);margin-top:0.7rem;display:block;}
 
-.deckle{width:100%;height:6px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='6'%3E%3Cpath d='M0 6 Q5 0 10 6 Q15 0 20 6 Q25 0 30 6 Q35 0 40 6' fill='none' stroke='%23C9A96E' stroke-width='0.8' stroke-opacity='0.35'/%3E%3C/svg%3E") repeat-x center;margin:1.5rem 0;}
-.btn-create{width:100%;padding:1rem;background:var(--ink);color:var(--ivory);font-size:0.75rem;letter-spacing:0.18em;text-transform:uppercase;border:none;border-radius:6px;cursor:none;transition:all 0.3s;}
-.btn-create:hover{background:var(--sepia);transform:translateY(-2px);}
+/* Candy SVG shapes */
+.candy-shape{width:28px;height:28px;display:block;}
+
+.deckle{width:100%;height:8px;background:repeating-linear-gradient(90deg, transparent 0 6px, var(--gold-light) 6px 8px);opacity:0.5;border-radius:4px;margin:1.8rem 0;}
+.btn-create{width:100%;padding:1.1rem;background:linear-gradient(135deg,var(--pink-deep),var(--rose));color:white;font-size:0.78rem;letter-spacing:0.18em;text-transform:uppercase;border:none;border-radius:10px;cursor:none;transition:all 0.3s;font-weight:600;box-shadow:0 8px 24px rgba(232,84,122,0.3);}
+.btn-create:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(232,84,122,0.4);}
 
 /* SHARE SCREEN */
 .share-wrap{max-width:500px;margin:0 auto;padding:4rem 2rem;text-align:center;animation:fadeUp 0.8s ease both;}
 .share-icon{font-size:3rem;margin-bottom:1.5rem;}
-.share-title{font-family:'IM Fell English',serif;font-size:1.8rem;font-style:italic;margin-bottom:0.8rem;}
-.share-sub{font-style:italic;font-size:0.8rem;color:var(--sepia);line-height:1.8;margin-bottom:2rem;}
-.link-box{background:var(--linen);border:1px solid rgba(201,169,110,0.4);border-radius:6px;padding:1rem 1.4rem;font-size:0.72rem;color:var(--sepia);margin-bottom:1.5rem;word-break:break-all;cursor:none;transition:border-color 0.3s;}
-.link-box:hover{border-color:var(--gold);}
+.share-title{font-family:'IM Fell English',serif;font-size:1.9rem;font-style:italic;margin-bottom:0.8rem;}
+.share-sub{font-style:italic;font-size:0.82rem;color:var(--sepia);line-height:1.8;margin-bottom:2rem;}
+.link-box{background:white;border:1.5px solid rgba(212,168,90,0.35);border-radius:10px;padding:1rem 1.4rem;font-size:0.72rem;color:var(--sepia);margin-bottom:1.2rem;word-break:break-all;cursor:none;transition:border-color 0.3s;}
+.link-box:hover{border-color:var(--pink-deep);}
+.qr-box{background:white;border:1.5px solid rgba(212,168,90,0.35);border-radius:14px;padding:1.2rem;display:inline-block;margin-bottom:1.5rem;}
+.qr-label{font-size:0.65rem;font-style:italic;color:var(--sepia);margin-top:0.6rem;letter-spacing:0.1em;}
 .share-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
-.btn-copy,.btn-outline{padding:0.8rem 2rem;font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;border-radius:4px;cursor:none;transition:all 0.3s;}
-.btn-copy{background:var(--ink);color:var(--ivory);border:none;}
-.btn-copy:hover{background:var(--sepia);}
-.btn-outline{background:transparent;color:var(--sepia);border:1px solid rgba(201,169,110,0.5);}
-.btn-outline:hover{border-color:var(--gold);color:var(--ink);}
-.copied-msg{margin-top:1rem;font-style:italic;font-size:0.68rem;color:var(--sage);display:none;}
+.btn-copy,.btn-outline{padding:0.85rem 2rem;font-size:0.74rem;letter-spacing:0.15em;text-transform:uppercase;border-radius:8px;cursor:none;transition:all 0.3s;font-weight:600;}
+.btn-copy{background:linear-gradient(135deg,var(--pink-deep),var(--rose));color:white;border:none;box-shadow:0 6px 18px rgba(232,84,122,0.3);}
+.btn-copy:hover{transform:translateY(-2px);}
+.btn-outline{background:white;color:var(--sepia);border:1.5px solid rgba(212,168,90,0.4);}
+.btn-outline:hover{border-color:var(--pink-deep);color:var(--ink);}
+.copied-msg{margin-top:1rem;font-style:italic;font-size:0.7rem;color:var(--sage);display:none;}
 
 @media(max-width:600px){
   .jar-grid{grid-template-columns:repeat(3,1fr);gap:0.6rem;}
@@ -152,19 +157,19 @@ header{position:relative;z-index:10;padding:1.5rem 2.5rem;display:flex;justify-c
       <span class="field-label">✦ Cloth Cover</span>
       <div class="cloth-grid">
         <div class="cloth-card selected" id="cloth-red" onclick="pickCloth('red')">
-          <div class="cloth-swatch" style="background:repeating-linear-gradient(45deg,#E8A4A4 0,#E8A4A4 6px,#FBEAEA 6px,#FBEAEA 12px);"></div>
-          <div class="cloth-name">Red Gingham</div>
+          <div class="cloth-swatch" style="background:repeating-linear-gradient(45deg,#E8849B 0,#E8849B 6px,#FFE5EC 6px,#FFE5EC 12px);"></div>
+          <div class="cloth-name">Rose Gingham</div>
         </div>
         <div class="cloth-card" id="cloth-pink" onclick="pickCloth('pink')">
-          <div class="cloth-swatch" style="background:repeating-linear-gradient(45deg,#F4B8CC 0,#F4B8CC 6px,#FDEAF1 6px,#FDEAF1 12px);"></div>
+          <div class="cloth-swatch" style="background:repeating-linear-gradient(45deg,#FF9EBB 0,#FF9EBB 6px,#FFEAF2 6px,#FFEAF2 12px);"></div>
           <div class="cloth-name">Pink Lace</div>
         </div>
         <div class="cloth-card" id="cloth-blue" onclick="pickCloth('blue')">
-          <div class="cloth-swatch" style="background:repeating-linear-gradient(45deg,#A9C6E8 0,#A9C6E8 6px,#EAF2FB 6px,#EAF2FB 12px);"></div>
+          <div class="cloth-swatch" style="background:repeating-linear-gradient(45deg,#9EC4EE 0,#9EC4EE 6px,#EAF3FD 6px,#EAF3FD 12px);"></div>
           <div class="cloth-name">Soft Blue</div>
         </div>
         <div class="cloth-card" id="cloth-cream" onclick="pickCloth('cream')">
-          <div class="cloth-swatch" style="background:repeating-linear-gradient(45deg,#E8D5A3 0,#E8D5A3 6px,#FBF6EA 6px,#FBF6EA 12px);"></div>
+          <div class="cloth-swatch" style="background:repeating-linear-gradient(45deg,#E8D5A3 0,#E8D5A3 6px,#FFF8EA 6px,#FFF8EA 12px);"></div>
           <div class="cloth-name">Cream Linen</div>
         </div>
       </div>
@@ -174,18 +179,7 @@ header{position:relative;z-index:10;padding:1.5rem 2.5rem;display:flex;justify-c
     <div class="field-group">
       <span class="field-label">✦ Fill With Candies</span>
       <div class="candy-grid" id="candy-grid">
-        <div class="candy-chip selected" data-candy="🍬" onclick="toggleCandy(this)">🍬</div>
-        <div class="candy-chip selected" data-candy="🍭" onclick="toggleCandy(this)">🍭</div>
-        <div class="candy-chip selected" data-candy="🍫" onclick="toggleCandy(this)">🍫</div>
-        <div class="candy-chip" data-candy="🍡" onclick="toggleCandy(this)">🍡</div>
-        <div class="candy-chip" data-candy="🍩" onclick="toggleCandy(this)">🍩</div>
-        <div class="candy-chip" data-candy="🧁" onclick="toggleCandy(this)">🧁</div>
-        <div class="candy-chip" data-candy="🍪" onclick="toggleCandy(this)">🍪</div>
-        <div class="candy-chip" data-candy="🍓" onclick="toggleCandy(this)">🍓</div>
-        <div class="candy-chip selected" data-candy="🌸" onclick="toggleCandy(this)">🌸</div>
-        <div class="candy-chip" data-candy="🍒" onclick="toggleCandy(this)">🍒</div>
-        <div class="candy-chip" data-candy="💖" onclick="toggleCandy(this)">💖</div>
-        <div class="candy-chip" data-candy="⭐" onclick="toggleCandy(this)">⭐</div>
+        <!-- candies inserted by JS -->
       </div>
       <span class="candy-hint">Tap to choose which candies fill your jar ✦</span>
     </div>
@@ -212,7 +206,11 @@ header{position:relative;z-index:10;padding:1.5rem 2.5rem;display:flex;justify-c
   <div class="share-wrap">
     <div class="share-icon">🍬</div>
     <div class="share-title">Your jar is ready.</div>
-    <div class="share-sub">Send this link to your beloved.<br/>They'll unwrap the cloth, shake the jar open, and find your note waiting inside.</div>
+    <div class="share-sub">Send this link or QR code to your beloved.<br/>They'll unwrap the cloth, shake the jar open, and find your note waiting inside.</div>
+    <div class="qr-box">
+      <div id="qr-code"></div>
+      <div class="qr-label">scan to open ✦</div>
+    </div>
     <div class="link-box" id="link-display" onclick="copyLink()">Click to copy your link ✦</div>
     <div class="share-btns">
       <button class="btn-copy" onclick="copyLink()">Copy Link ✦</button>
@@ -226,27 +224,61 @@ header{position:relative;z-index:10;padding:1.5rem 2.5rem;display:flex;justify-c
 const cur=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
 document.addEventListener('mousemove',e=>{cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';setTimeout(()=>{ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px';},80);});
 
-let state={jar:'round',glass:'clear',cloth:'red',candies:['🍬','🍭','🍫','🌸']};
+// CANDY SHAPES - drawn as SVG, not emoji (reliable rendering)
+const CANDY_TYPES = [
+  {id:'gummy', label:'Gummy Bear', color:'#FF9EBB', svg:'<svg class="candy-shape" viewBox="0 0 28 28"><ellipse cx="14" cy="10" rx="6" ry="6" fill="{c}"/><ellipse cx="14" cy="20" rx="8" ry="7" fill="{c}"/><circle cx="9" cy="6" r="2.5" fill="{c}"/><circle cx="19" cy="6" r="2.5" fill="{c}"/></svg>'},
+  {id:'lolly', label:'Lollipop', color:'#FF6FA5', svg:'<svg class="candy-shape" viewBox="0 0 28 28"><circle cx="14" cy="11" r="8" fill="{c}"/><circle cx="14" cy="11" r="8" fill="none" stroke="white" stroke-width="1.5" stroke-dasharray="3 3"/><rect x="13" y="18" width="2" height="9" fill="#C9A96E"/></svg>'},
+  {id:'choco', label:'Chocolate', color:'#A0654B', svg:'<svg class="candy-shape" viewBox="0 0 28 28"><rect x="4" y="8" width="20" height="12" rx="2" fill="{c}"/><line x1="14" y1="8" x2="14" y2="20" stroke="#7A4632" stroke-width="1.5"/><line x1="4" y1="14" x2="24" y2="14" stroke="#7A4632" stroke-width="1.5"/></svg>'},
+  {id:'gum', label:'Bubblegum', color:'#FFB3DA', svg:'<svg class="candy-shape" viewBox="0 0 28 28"><circle cx="11" cy="14" r="7" fill="{c}"/><circle cx="20" cy="9" r="5" fill="{c}" opacity="0.85"/></svg>'},
+  {id:'donut', label:'Donut', color:'#F2B6C6', svg:'<svg class="candy-shape" viewBox="0 0 28 28"><circle cx="14" cy="14" r="11" fill="{c}"/><circle cx="14" cy="14" r="4" fill="#FFF9F4"/><circle cx="9" cy="9" r="1.3" fill="#fff"/><circle cx="19" cy="10" r="1.3" fill="#fff"/><circle cx="20" cy="18" r="1.3" fill="#fff"/><circle cx="10" cy="19" r="1.3" fill="#fff"/></svg>'},
+  {id:'cupcake', label:'Cupcake', color:'#FF8FB8', svg:'<svg class="candy-shape" viewBox="0 0 28 28"><path d="M6 12 L22 12 L19 24 L9 24 Z" fill="#C9A96E"/><ellipse cx="14" cy="11" rx="9" ry="6" fill="{c}"/><circle cx="14" cy="4" r="2" fill="#E8547A"/></svg>'},
+  {id:'cookie', label:'Cookie', color:'#D9A86C', svg:'<svg class="candy-shape" viewBox="0 0 28 28"><circle cx="14" cy="14" r="11" fill="{c}"/><circle cx="9" cy="10" r="1.6" fill="#7A4632"/><circle cx="17" cy="9" r="1.6" fill="#7A4632"/><circle cx="19" cy="17" r="1.6" fill="#7A4632"/><circle cx="11" cy="18" r="1.6" fill="#7A4632"/><circle cx="15" cy="15" r="1.6" fill="#7A4632"/></svg>'},
+  {id:'berry', label:'Strawberry', color:'#FF6B81', svg:'<svg class="candy-shape" viewBox="0 0 28 28"><path d="M14 26 C8 26 5 18 5 14 C5 9 9 8 14 8 C19 8 23 9 23 14 C23 18 20 26 14 26 Z" fill="{c}"/><path d="M9 8 L11 3 L14 7 L17 3 L19 8 Z" fill="#8A9F8A"/><circle cx="10" cy="14" r="1" fill="#FFE5EC"/><circle cx="16" cy="13" r="1" fill="#FFE5EC"/><circle cx="13" cy="19" r="1" fill="#FFE5EC"/><circle cx="18" cy="18" r="1" fill="#FFE5EC"/></svg>'},
+  {id:'flowercandy', label:'Flower Candy', color:'#FFD6E8', svg:'<svg class="candy-shape" viewBox="0 0 28 28"><circle cx="14" cy="8" r="5" fill="{c}"/><circle cx="20" cy="13" r="5" fill="{c}"/><circle cx="18" cy="20" r="5" fill="{c}"/><circle cx="10" cy="20" r="5" fill="{c}"/><circle cx="8" cy="13" r="5" fill="{c}"/><circle cx="14" cy="14" r="4" fill="#E8547A"/></svg>'},
+  {id:'cherry', label:'Cherries', color:'#E8547A', svg:'<svg class="candy-shape" viewBox="0 0 28 28"><path d="M16 6 Q22 2 24 6" fill="none" stroke="#8A9F8A" stroke-width="1.5"/><circle cx="10" cy="19" r="6" fill="{c}"/><circle cx="20" cy="19" r="6" fill="{c}"/><circle cx="9" cy="17" r="1.3" fill="#FFD6E8"/><circle cx="19" cy="17" r="1.3" fill="#FFD6E8"/></svg>'},
+  {id:'heart', label:'Heart Candy', color:'#FF5C8A', svg:'<svg class="candy-shape" viewBox="0 0 28 28"><path d="M14 24 C6 17 3 12 6 8 C8 5.5 12 6 14 10 C16 6 20 5.5 22 8 C25 12 22 17 14 24 Z" fill="{c}"/></svg>'},
+  {id:'star', label:'Star Candy', color:'#F0C95A', svg:'<svg class="candy-shape" viewBox="0 0 28 28"><path d="M14 2 L17.5 10.5 L26.5 11 L19.5 16.8 L22 25.5 L14 20.3 L6 25.5 L8.5 16.8 L1.5 11 L10.5 10.5 Z" fill="{c}"/></svg>'}
+];
+
+// Build candy grid
+const candyGrid=document.getElementById('candy-grid');
+const defaultSelected=['gummy','lolly','choco','flowercandy'];
+CANDY_TYPES.forEach(c=>{
+  const div=document.createElement('div');
+  div.className='candy-chip'+(defaultSelected.includes(c.id)?' selected':'');
+  div.dataset.candy=c.id;
+  div.innerHTML=c.svg.replace(/{c}/g,c.color);
+  div.title=c.label;
+  div.onclick=()=>div.classList.toggle('selected');
+  candyGrid.appendChild(div);
+});
+
+let state={jar:'round',glass:'clear',cloth:'red'};
 
 function pickJar(j){state.jar=j;document.querySelectorAll('.jar-card').forEach(c=>c.classList.remove('selected'));document.getElementById('jar-'+j).classList.add('selected');}
 function pickGlass(g){state.glass=g;document.querySelectorAll('.toggle-btn').forEach(c=>c.classList.remove('selected'));document.getElementById('glass-'+g).classList.add('selected');}
 function pickCloth(c){state.cloth=c;document.querySelectorAll('.cloth-card').forEach(c=>c.classList.remove('selected'));document.getElementById('cloth-'+c).classList.add('selected');}
-function toggleCandy(el){
-  el.classList.toggle('selected');
-  state.candies=[...document.querySelectorAll('.candy-chip.selected')].map(c=>c.dataset.candy);
-}
 
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
 function goBack(){showScreen('screen-composer');}
 
 function createJar(){
-  if(state.candies.length===0){alert('Please choose at least one candy 🍬');return;}
+  const selectedCandies=[...document.querySelectorAll('.candy-chip.selected')].map(c=>c.dataset.candy);
+  if(selectedCandies.length===0){alert('Please choose at least one candy 🍬');return;}
   const name=document.getElementById('inp-name').value.trim()||'My Love';
   const note=document.getElementById('inp-note').value.trim()||'For my love. Something sweet for someone sweet. 🌸';
-  const data={jar:state.jar,glass:state.glass,cloth:state.cloth,candies:state.candies,name,note};
-  const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-  const link=window.location.origin+'/candy-view.html?data='+encoded;
+  const data={jar:state.jar,glass:state.glass,cloth:state.cloth,candies:selectedCandies,name,note};
+  const encoded=encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(data)))));
+  const link=window.location.origin+window.location.pathname.replace('candyjar.html','')+'candy-view.html?data='+encoded;
   document.getElementById('link-display').textContent=link;
+
+  // QR code
+  document.getElementById('qr-code').innerHTML='';
+  new QRCode(document.getElementById('qr-code'), {
+    text: link, width: 140, height: 140,
+    colorDark: "#2C2523", colorLight: "#ffffff"
+  });
+
   showScreen('screen-share');
 }
 
@@ -263,7 +295,7 @@ function copyLink(){
 const bgC=document.getElementById('petals-canvas'),bgCtx=bgC.getContext('2d');
 let bgW=bgC.width=window.innerWidth,bgH=bgC.height=window.innerHeight;
 window.addEventListener('resize',()=>{bgW=bgC.width=window.innerWidth;bgH=bgC.height=window.innerHeight;});
-const bgColors=['rgba(232,180,173,','rgba(201,132,122,','rgba(201,169,110,','rgba(138,159,138,'];
+const bgColors=['rgba(255,158,187,','rgba(232,84,122,','rgba(212,168,90,','rgba(138,159,138,'];
 class BGP{constructor(){this.r(true);}r(i){this.x=Math.random()*bgW;this.y=i?Math.random()*bgH:-20;this.s=Math.random()*5+2;this.sy=Math.random()*0.35+0.12;this.sx=(Math.random()-0.5)*0.2;this.op=Math.random()*0.22+0.06;this.rot=Math.random()*Math.PI*2;this.rs=(Math.random()-0.5)*0.01;this.c=bgColors[Math.floor(Math.random()*bgColors.length)];this.w=Math.random()*Math.PI*2;this.ws=Math.random()*0.01+0.003;}u(){this.w+=this.ws;this.x+=this.sx+Math.sin(this.w)*0.2;this.y+=this.sy;this.rot+=this.rs;if(this.y>bgH+15)this.r(false);}d(){bgCtx.save();bgCtx.translate(this.x,this.y);bgCtx.rotate(this.rot);bgCtx.globalAlpha=this.op;bgCtx.fillStyle=this.c+'1)';bgCtx.beginPath();bgCtx.ellipse(0,0,this.s,this.s*1.6,0,0,Math.PI*2);bgCtx.fill();bgCtx.restore();}}
 const bgPs=Array.from({length:28},()=>new BGP());
 function bgLoop(){bgCtx.clearRect(0,0,bgW,bgH);bgPs.forEach(p=>{p.u();p.d();});requestAnimationFrame(bgLoop);}
