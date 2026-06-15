@@ -5,80 +5,83 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>CipherGiftyy — Music Corner</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IM+Fell+English:ital@0;1&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-:root{--ivory:#FAF8F5;--linen:#F3EFE8;--ink:#2C2523;--sepia:#5C3D2E;--rose:#C9847A;--gold:#C9A96E;--gold-light:#E8D5A3;--sage:#8A9F8A;}
+:root{--ivory:#FFF9F4;--linen:#FBF1E8;--ink:#2C2523;--sepia:#5C3D2E;--rose:#E8849B;--gold:#D4A85A;--gold-light:#F0D9A8;--sage:#8A9F8A;--pink-deep:#E8547A;}
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{min-height:100vh;background:var(--ivory);font-family:'Lora',serif;color:var(--ink);cursor:none;overflow-x:hidden;}
-.cursor{width:10px;height:10px;border-radius:50%;background:var(--rose);position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply;}
-.cursor-ring{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--gold);position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);}
+.cursor{width:10px;height:10px;border-radius:50%;background:var(--pink-deep);position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply;}
+.cursor-ring{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--gold);position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);}
 #petals-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;}
 
-header{position:relative;z-index:10;padding:1.5rem 2.5rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(201,169,110,0.2);}
+header{position:relative;z-index:10;padding:1.5rem 2.5rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(212,168,90,0.25);background:rgba(255,255,255,0.5);backdrop-filter:blur(6px);}
 .back-home{font-style:italic;font-size:0.75rem;letter-spacing:0.12em;color:var(--gold);text-decoration:none;}
-.logo{font-family:'IM Fell English',serif;font-size:1.1rem;color:var(--ink);}
-.logo span{color:var(--gold);}
+.logo{font-family:'IM Fell English',serif;font-size:1.15rem;color:var(--ink);font-weight:bold;}
+.logo span{color:var(--pink-deep);}
 .header-tag{font-style:italic;font-size:0.7rem;color:var(--sepia);}
 
 .screen{display:none;position:relative;z-index:10;}
 .screen.active{display:block;}
 
-.composer{max-width:680px;margin:0 auto;padding:3rem 2rem 5rem;animation:fadeUp 0.8s ease both;}
+.composer{max-width:700px;margin:0 auto;padding:3rem 2rem 5rem;animation:fadeUp 0.8s ease both;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
-.section-label{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1rem;}
+.section-label{font-size:0.62rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--pink-deep);display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1rem;font-weight:600;}
 .section-label::before,.section-label::after{content:'';display:inline-block;width:40px;height:1px;background:var(--gold-light);}
-.page-title{font-family:'IM Fell English',serif;font-size:2.2rem;font-style:italic;text-align:center;margin-bottom:0.5rem;}
-.page-sub{font-style:italic;font-size:0.82rem;color:var(--sepia);text-align:center;line-height:1.8;margin-bottom:2.5rem;}
+.page-title{font-family:'IM Fell English',serif;font-size:2.4rem;font-style:italic;text-align:center;margin-bottom:0.5rem;}
+.page-sub{font-style:italic;font-size:0.84rem;color:var(--sepia);text-align:center;line-height:1.8;margin-bottom:2.5rem;}
 
 .field-group{margin-bottom:2rem;}
-.field-label{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.8rem;display:block;}
-.field-input,.field-textarea{width:100%;background:var(--linen);border:1px solid rgba(201,169,110,0.3);border-radius:6px;padding:0.9rem 1.2rem;font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic;color:var(--sepia);outline:none;cursor:text;transition:border-color 0.3s;}
-.field-input:focus,.field-textarea:focus{border-color:var(--gold);}
+.field-label{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--pink-deep);margin-bottom:0.8rem;display:block;font-weight:600;}
+.field-input,.field-textarea{width:100%;background:white;border:1.5px solid rgba(212,168,90,0.3);border-radius:10px;padding:0.9rem 1.2rem;font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic;color:var(--sepia);outline:none;cursor:text;transition:border-color 0.3s;}
+.field-input:focus,.field-textarea:focus{border-color:var(--pink-deep);}
 .field-textarea{min-height:90px;resize:none;line-height:1.8;}
-.field-hint{font-size:0.65rem;font-style:italic;color:var(--sepia);margin-top:0.5rem;display:block;}
+.field-hint{font-size:0.66rem;font-style:italic;color:var(--sepia);margin-top:0.5rem;display:block;}
 
 /* CHAMBER PICKER */
 .chamber-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;}
-.chamber-card{border:2px solid rgba(201,169,110,0.2);border-radius:10px;padding:1.4rem 1.2rem;cursor:none;transition:all 0.3s;background:var(--linen);position:relative;}
-.chamber-card:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,0.06);}
-.chamber-card.selected{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,169,110,0.18);}
-.check-badge{position:absolute;top:0.6rem;right:0.6rem;width:18px;height:18px;border-radius:50%;background:var(--gold);color:white;font-size:0.6rem;display:none;align-items:center;justify-content:center;}
+.chamber-card{border:2px solid rgba(212,168,90,0.25);border-radius:14px;padding:1.4rem 1.2rem;cursor:none;transition:all 0.3s;background:linear-gradient(160deg,#FFFFFF,#FFF6EF);position:relative;}
+.chamber-card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(0,0,0,0.06);}
+.chamber-card.selected{border-color:var(--pink-deep);box-shadow:0 0 0 4px rgba(232,84,122,0.15);}
+.check-badge{position:absolute;top:0.6rem;right:0.6rem;width:20px;height:20px;border-radius:50%;background:var(--pink-deep);color:white;font-size:0.65rem;display:none;align-items:center;justify-content:center;font-weight:bold;}
 .chamber-card.selected .check-badge{display:flex;}
 .chamber-icon{font-size:1.8rem;margin-bottom:0.5rem;}
 .chamber-name{font-family:'IM Fell English',serif;font-size:1rem;font-style:italic;margin-bottom:0.3rem;}
-.chamber-desc{font-size:0.7rem;color:var(--sepia);font-style:italic;line-height:1.6;}
+.chamber-desc{font-size:0.72rem;color:var(--sepia);font-style:italic;line-height:1.6;}
 
 /* THEME PICKER */
 .theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
-.theme-card{border:2px solid rgba(201,169,110,0.2);border-radius:10px;padding:1.2rem 0.8rem;cursor:none;transition:all 0.3s;text-align:center;position:relative;}
-.theme-card:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,0.06);}
-.theme-card.selected{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,169,110,0.18);}
+.theme-card{border:2px solid rgba(212,168,90,0.25);border-radius:14px;padding:1.2rem 0.8rem;cursor:none;transition:all 0.3s;text-align:center;position:relative;}
+.theme-card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(0,0,0,0.06);}
+.theme-card.selected{border-color:var(--pink-deep);box-shadow:0 0 0 4px rgba(232,84,122,0.15);}
 .theme-card.selected .check-badge{display:flex;}
-.theme-petals{background:linear-gradient(135deg,#FFF0F3,#FFD6E2);}
-.theme-snow{background:linear-gradient(135deg,#EEF6FF,#D6ECFF);}
-.theme-stars{background:linear-gradient(135deg,#2A2440,#3D3560);color:#F4EFE8;}
+.theme-petals{background:linear-gradient(135deg,#FFE0EB,#FFC4D6);}
+.theme-snow{background:linear-gradient(135deg,#E3F1FF,#C2E2FF);}
+.theme-stars{background:linear-gradient(135deg,#3B3162,#564A8C);color:#F4EFE8;}
 .theme-stars .theme-name,.theme-stars .theme-vibe{color:#F4EFE8;}
 .theme-emoji{font-size:1.8rem;margin-bottom:0.4rem;}
-.theme-name{font-family:'IM Fell English',serif;font-size:0.9rem;font-style:italic;}
-.theme-vibe{font-size:0.65rem;color:var(--sepia);margin-top:0.2rem;font-style:italic;}
+.theme-name{font-family:'IM Fell English',serif;font-size:0.92rem;font-style:italic;}
+.theme-vibe{font-size:0.66rem;color:var(--sepia);margin-top:0.2rem;font-style:italic;}
 
-.deckle{width:100%;height:6px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='6'%3E%3Cpath d='M0 6 Q5 0 10 6 Q15 0 20 6 Q25 0 30 6 Q35 0 40 6' fill='none' stroke='%23C9A96E' stroke-width='0.8' stroke-opacity='0.35'/%3E%3C/svg%3E") repeat-x center;margin:1.5rem 0;}
-.btn-create{width:100%;padding:1rem;background:var(--ink);color:var(--ivory);font-size:0.75rem;letter-spacing:0.18em;text-transform:uppercase;border:none;border-radius:6px;cursor:none;transition:all 0.3s;}
-.btn-create:hover{background:var(--sepia);transform:translateY(-2px);}
+.deckle{width:100%;height:8px;background:repeating-linear-gradient(90deg, transparent 0 6px, var(--gold-light) 6px 8px);opacity:0.5;border-radius:4px;margin:1.8rem 0;}
+.btn-create{width:100%;padding:1.1rem;background:linear-gradient(135deg,var(--pink-deep),var(--rose));color:white;font-size:0.78rem;letter-spacing:0.18em;text-transform:uppercase;border:none;border-radius:10px;cursor:none;transition:all 0.3s;font-weight:600;box-shadow:0 8px 24px rgba(232,84,122,0.3);}
+.btn-create:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(232,84,122,0.4);}
 
 /* SHARE */
 .share-wrap{max-width:500px;margin:0 auto;padding:4rem 2rem;text-align:center;animation:fadeUp 0.8s ease both;}
 .share-icon{font-size:3rem;margin-bottom:1.5rem;}
-.share-title{font-family:'IM Fell English',serif;font-size:1.8rem;font-style:italic;margin-bottom:0.8rem;}
-.share-sub{font-style:italic;font-size:0.8rem;color:var(--sepia);line-height:1.8;margin-bottom:2rem;}
-.link-box{background:var(--linen);border:1px solid rgba(201,169,110,0.4);border-radius:6px;padding:1rem 1.4rem;font-size:0.72rem;color:var(--sepia);margin-bottom:1.5rem;word-break:break-all;cursor:none;transition:border-color 0.3s;}
-.link-box:hover{border-color:var(--gold);}
+.share-title{font-family:'IM Fell English',serif;font-size:1.9rem;font-style:italic;margin-bottom:0.8rem;}
+.share-sub{font-style:italic;font-size:0.82rem;color:var(--sepia);line-height:1.8;margin-bottom:2rem;}
+.link-box{background:white;border:1.5px solid rgba(212,168,90,0.35);border-radius:10px;padding:1rem 1.4rem;font-size:0.72rem;color:var(--sepia);margin-bottom:1.2rem;word-break:break-all;cursor:none;transition:border-color 0.3s;}
+.link-box:hover{border-color:var(--pink-deep);}
+.qr-box{background:white;border:1.5px solid rgba(212,168,90,0.35);border-radius:14px;padding:1.2rem;display:inline-block;margin-bottom:1.5rem;}
+.qr-label{font-size:0.65rem;font-style:italic;color:var(--sepia);margin-top:0.6rem;letter-spacing:0.1em;}
 .share-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
-.btn-copy,.btn-outline{padding:0.8rem 2rem;font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;border-radius:4px;cursor:none;transition:all 0.3s;}
-.btn-copy{background:var(--ink);color:var(--ivory);border:none;}
-.btn-copy:hover{background:var(--sepia);}
-.btn-outline{background:transparent;color:var(--sepia);border:1px solid rgba(201,169,110,0.5);}
-.btn-outline:hover{border-color:var(--gold);color:var(--ink);}
-.copied-msg{margin-top:1rem;font-style:italic;font-size:0.68rem;color:var(--sage);display:none;}
+.btn-copy,.btn-outline{padding:0.85rem 2rem;font-size:0.74rem;letter-spacing:0.15em;text-transform:uppercase;border-radius:8px;cursor:none;transition:all 0.3s;font-weight:600;}
+.btn-copy{background:linear-gradient(135deg,var(--pink-deep),var(--rose));color:white;border:none;box-shadow:0 6px 18px rgba(232,84,122,0.3);}
+.btn-copy:hover{transform:translateY(-2px);}
+.btn-outline{background:white;color:var(--sepia);border:1.5px solid rgba(212,168,90,0.4);}
+.btn-outline:hover{border-color:var(--pink-deep);color:var(--ink);}
+.copied-msg{margin-top:1rem;font-style:italic;font-size:0.7rem;color:var(--sage);display:none;}
 
 .hidden-field{display:none;}
 
@@ -154,8 +157,8 @@ header{position:relative;z-index:10;padding:1.5rem 2.5rem;display:flex;justify-c
     <!-- PICTURE URL (shown only for pic chamber) -->
     <div class="field-group hidden-field" id="field-picture">
       <label class="field-label">✦ Picture Link</label>
-      <input class="field-input" id="inp-picture" type="text" placeholder="Paste an image link (from Google Drive, Imgur, etc.)"/>
-      <span class="field-hint">Tip: Upload your photo to a free image host like imgur.com and paste the direct image link here.</span>
+      <input class="field-input" id="inp-picture" type="text" placeholder="Paste an image link (from Imgur, Postimg, etc.)"/>
+      <span class="field-hint">Tip: Upload your photo to a free image host like postimages.org or imgur.com and paste the DIRECT image link here (must end in .jpg/.png).</span>
     </div>
 
     <!-- SONG LINK -->
@@ -187,10 +190,15 @@ header{position:relative;z-index:10;padding:1.5rem 2.5rem;display:flex;justify-c
   <div class="share-wrap">
     <div class="share-icon">🎵</div>
     <div class="share-title">Your song is ready.</div>
-    <div class="share-sub">Send this link to your beloved.<br/>They'll open it, watch the animation bloom, and press play.</div>
+    <div class="share-sub">Send this link or QR code to your beloved.<br/>They'll open it, watch the animation bloom, and press play.</div>
+    <div class="qr-box">
+      <div id="qr-code"></div>
+      <div class="qr-label">scan to open ✦</div>
+    </div>
     <div class="link-box" id="link-display" onclick="copyLink()">Click to copy your link ✦</div>
     <div class="share-btns">
       <button class="btn-copy" onclick="copyLink()">Copy Link ✦</button>
+      <button class="btn-outline" onclick="testLink()">Open & Test ✦</button>
       <button class="btn-outline" onclick="goBack()">Make Another</button>
     </div>
     <div class="copied-msg" id="copied-msg">✦ Copied! Now send it with love. ✦</div>
@@ -202,6 +210,7 @@ const cur=document.getElementById('cursor'),ring=document.getElementById('cursor
 document.addEventListener('mousemove',e=>{cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';setTimeout(()=>{ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px';},80);});
 
 let state={chamber:'anim',theme:'petals'};
+let currentLink='';
 
 function pickChamber(c){
   state.chamber=c;
@@ -225,16 +234,28 @@ function createMusic(){
   const picture=document.getElementById('inp-picture').value.trim();
   if(!song){alert('Please paste a song link first 🎵');return;}
   if(state.chamber==='pic' && !picture){alert('Please paste a picture link, or switch to Voice Note + Animation 🌸');return;}
-  const data={chamber:state.chamber,theme:state.theme,song,name,note,picture};
-  const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-  const link=window.location.origin+'/music-view.html?data='+encoded;
-  document.getElementById('link-display').textContent=link;
+
+  const data={chamber:state.chamber,theme:state.theme,song:song,name:name,note:note,picture:picture};
+  const jsonStr=JSON.stringify(data);
+  const encoded=encodeURIComponent(btoa(unescape(encodeURIComponent(jsonStr))));
+  currentLink=window.location.origin+window.location.pathname.replace('musiccorner.html','')+'music-view.html?data='+encoded;
+  document.getElementById('link-display').textContent=currentLink;
+
+  document.getElementById('qr-code').innerHTML='';
+  new QRCode(document.getElementById('qr-code'), {
+    text: currentLink, width: 140, height: 140,
+    colorDark: "#2C2523", colorLight: "#ffffff"
+  });
+
   showScreen('screen-share');
 }
 
+function testLink(){
+  window.open(currentLink, '_blank');
+}
+
 function copyLink(){
-  const link=document.getElementById('link-display').textContent;
-  navigator.clipboard.writeText(link).then(()=>{
+  navigator.clipboard.writeText(currentLink).then(()=>{
     const m=document.getElementById('copied-msg');
     m.style.display='block';
     setTimeout(()=>m.style.display='none',3000);
@@ -245,7 +266,7 @@ function copyLink(){
 const bgC=document.getElementById('petals-canvas'),bgCtx=bgC.getContext('2d');
 let bgW=bgC.width=window.innerWidth,bgH=bgC.height=window.innerHeight;
 window.addEventListener('resize',()=>{bgW=bgC.width=window.innerWidth;bgH=bgC.height=window.innerHeight;});
-const bgColors=['rgba(232,180,173,','rgba(201,132,122,','rgba(201,169,110,','rgba(138,159,138,'];
+const bgColors=['rgba(255,158,187,','rgba(232,84,122,','rgba(212,168,90,','rgba(138,159,138,'];
 class BGP{constructor(){this.r(true);}r(i){this.x=Math.random()*bgW;this.y=i?Math.random()*bgH:-20;this.s=Math.random()*5+2;this.sy=Math.random()*0.35+0.12;this.sx=(Math.random()-0.5)*0.2;this.op=Math.random()*0.22+0.06;this.rot=Math.random()*Math.PI*2;this.rs=(Math.random()-0.5)*0.01;this.c=bgColors[Math.floor(Math.random()*bgColors.length)];this.w=Math.random()*Math.PI*2;this.ws=Math.random()*0.01+0.003;}u(){this.w+=this.ws;this.x+=this.sx+Math.sin(this.w)*0.2;this.y+=this.sy;this.rot+=this.rs;if(this.y>bgH+15)this.r(false);}d(){bgCtx.save();bgCtx.translate(this.x,this.y);bgCtx.rotate(this.rot);bgCtx.globalAlpha=this.op;bgCtx.fillStyle=this.c+'1)';bgCtx.beginPath();bgCtx.ellipse(0,0,this.s,this.s*1.6,0,0,Math.PI*2);bgCtx.fill();bgCtx.restore();}}
 const bgPs=Array.from({length:28},()=>new BGP());
 function bgLoop(){bgCtx.clearRect(0,0,bgW,bgH);bgPs.forEach(p=>{p.u();p.d();});requestAnimationFrame(bgLoop);}
