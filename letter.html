@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>CipherGiftyy — The Letter Corner</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IM+Fell+English:ital@0;1&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root{--ivory:#FAF8F5;--linen:#F3EFE8;--parchment:#EDE5D8;--ink:#2C2523;--sepia:#5C3D2E;--rose:#C9847A;--gold:#C9A96E;--gold-light:#E8D5A3;--sage:#8A9F8A;}
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -217,7 +218,11 @@ header{position:relative;z-index:10;padding:1.8rem 3rem;display:flex;justify-con
   <div class="share-screen">
     <div class="share-icon">🌸</div>
     <div class="share-title">Your letter is ready.</div>
-    <div class="share-sub">Copy this link and send it to your beloved.<br/>When they open it, your words will be waiting — like a letter that travelled through a garden.</div>
+    <div class="share-sub">Send this link or QR code to your beloved.<br/>When they open it, your words will be waiting — like a letter that travelled through a garden.</div>
+    <div style="background:white;border:1.5px solid rgba(201,169,110,0.35);border-radius:14px;padding:1.2rem;display:inline-block;margin-bottom:1.5rem;">
+      <div id="qr-code"></div>
+      <div style="font-size:0.65rem;font-style:italic;color:var(--sepia);margin-top:0.6rem;letter-spacing:0.1em;">scan to open ✦</div>
+    </div>
     <div class="share-link-box" id="share-link-display" onclick="copyLink()">Click to copy your gift link ✦</div>
     <div class="letter-actions">
       <button class="btn-primary" onclick="copyLink()">Copy Link ✦</button>
@@ -420,18 +425,22 @@ function openLetter(letter){
 
 function generateLink(){
   const content=document.getElementById('letter-textarea').value;
-  const encoded=btoa(unescape(encodeURIComponent(content)));
-  const link=`${window.location.origin}/read.html?letter=${encoded}`;
+  const encoded=encodeURIComponent(btoa(unescape(encodeURIComponent(content))));
+  const link=`${window.location.origin}${window.location.pathname.replace('letter.html','')}read.html?letter=${encoded}`;
   document.getElementById('share-link-display').textContent=link;
+  document.getElementById('qr-code').innerHTML='';
+  new QRCode(document.getElementById('qr-code'), {text: link, width: 140, height: 140, colorDark: "#2C2523", colorLight: "#ffffff"});
   showScreen('screen-share');
 }
 
 function generateOwnLink(){
   const content=document.getElementById('own-textarea').value;
   if(!content.trim()){alert('Please write something first. 🌸');return;}
-  const encoded=btoa(unescape(encodeURIComponent(content)));
-  const link=`${window.location.origin}/read.html?letter=${encoded}`;
+  const encoded=encodeURIComponent(btoa(unescape(encodeURIComponent(content))));
+  const link=`${window.location.origin}${window.location.pathname.replace('letter.html','')}read.html?letter=${encoded}`;
   document.getElementById('share-link-display').textContent=link;
+  document.getElementById('qr-code').innerHTML='';
+  new QRCode(document.getElementById('qr-code'), {text: link, width: 140, height: 140, colorDark: "#2C2523", colorLight: "#ffffff"});
   showScreen('screen-share');
 }
 
