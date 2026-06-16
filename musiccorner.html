@@ -5,7 +5,82 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>CipherGiftyy — Music Corner</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IM+Fell+English:ital@0;1&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
+let currentGiftLink = "";
+
+async function shortenLink(url) {
+  try {
+    const res = await fetch("https://tinyurl.com/api-create.php?url=" + encodeURIComponent(url));
+    if (res.ok) { const short = await res.text(); if (short.startsWith("https://tinyurl.com")) return short; }
+  } catch(e) {}
+  return url;
+}
+
+function downloadQRCode() {
+  const el = document.getElementById("qr-code");
+  const canvas = el.querySelector("canvas");
+  const img = el.querySelector("img");
+  if (canvas) {
+    const pad=20; const out=document.createElement("canvas");
+    out.width=canvas.width+pad*2; out.height=canvas.height+pad*2+24;
+    const ctx=out.getContext("2d"); ctx.fillStyle="#ffffff"; ctx.fillRect(0,0,out.width,out.height);
+    ctx.drawImage(canvas,pad,pad); ctx.fillStyle="#2C2523"; ctx.font="13px serif"; ctx.textAlign="center";
+    ctx.fillText("Scan to open your gift 🌸",out.width/2,out.height-6);
+    const a=document.createElement("a"); a.download="ciphergiftyy-gift-qr.png"; a.href=out.toDataURL("image/png"); a.click();
+  } else if(img){ const a=document.createElement("a"); a.download="ciphergiftyy-gift-qr.png"; a.href=img.src; a.click(); }
+}
+
+function shareViaWhatsApp(){
+  const link=currentGiftLink||document.getElementById("link-display").textContent;
+  window.open("https://wa.me/?text="+encodeURIComponent("I made something for you 🌸
+"+link),"_blank");
+}
+
+
+// ---- PHOTO UPLOAD ----
+let uploadedPicBase64 = '';
+
+function handlePicUpload(input) {
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  
+  // Compress image before base64 encoding
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      // Resize to max 480px wide for link size
+      const MAX = 480;
+      let w = img.width, h = img.height;
+      if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      uploadedPicBase64 = canvas.toDataURL('image/jpeg', 0.72);
+      
+      // Check size — warn if too large for URL
+      const sizeKB = Math.round(uploadedPicBase64.length * 0.75 / 1024);
+      
+      // Show preview
+      document.getElementById('upload-placeholder').style.display = 'none';
+      document.getElementById('pic-preview').src = uploadedPicBase64;
+      document.getElementById('pic-preview').style.display = 'block';
+      document.getElementById('pic-change-hint').style.display = 'block';
+      document.getElementById('upload-area').style.borderStyle = 'solid';
+      document.getElementById('upload-area').style.borderColor = 'rgba(232,84,122,0.4)';
+      
+      if (sizeKB > 80) {
+        // Re-compress more aggressively
+        uploadedPicBase64 = canvas.toDataURL('image/jpeg', 0.45);
+      }
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+</script>
 <style>
 :root{--ivory:#FFF9F4;--linen:#FBF1E8;--ink:#2C2523;--sepia:#5C3D2E;--rose:#E8849B;--gold:#D4A85A;--gold-light:#F0D9A8;--sage:#8A9F8A;--pink-deep:#E8547A;}
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -154,11 +229,20 @@ header{position:relative;z-index:10;padding:1.5rem 2.5rem;display:flex;justify-c
       </div>
     </div>
 
-    <!-- PICTURE URL (shown only for pic chamber) -->
+    <!-- PICTURE UPLOAD (shown only for pic chamber) -->
     <div class="field-group hidden-field" id="field-picture">
-      <label class="field-label">✦ Picture Link</label>
-      <input class="field-input" id="inp-picture" type="text" placeholder="Paste an image link (from Imgur, Postimg, etc.)"/>
-      <span class="field-hint">Tip: Upload your photo to a free image host like postimages.org or imgur.com and paste the DIRECT image link here (must end in .jpg/.png).</span>
+      <label class="field-label">✦ Add a Picture</label>
+      <div id="upload-area" onclick="document.getElementById('pic-file-input').click()" style="width:100%;background:white;border:2px dashed rgba(212,168,90,0.4);border-radius:12px;padding:2rem 1.2rem;text-align:center;cursor:none;transition:all 0.3s;">
+        <div id="upload-placeholder">
+          <div style="font-size:2rem;margin-bottom:0.6rem;">🖼️</div>
+          <div style="font-family:'IM Fell English',serif;font-size:1rem;font-style:italic;color:#2C2523;margin-bottom:0.4rem;">Tap to choose a photo</div>
+          <div style="font-size:0.7rem;font-style:italic;color:#5C3D2E;">from your gallery or Google Photos</div>
+        </div>
+        <img id="pic-preview" src="" style="display:none;max-width:100%;max-height:220px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.1);" alt="Preview"/>
+        <div id="pic-change-hint" style="display:none;margin-top:0.6rem;font-size:0.68rem;font-style:italic;color:#D4A85A;">tap to change photo</div>
+      </div>
+      <input type="file" id="pic-file-input" accept="image/*" style="display:none;" onchange="handlePicUpload(this)"/>
+      <span style="font-size:0.66rem;font-style:italic;color:#5C3D2E;margin-top:0.5rem;display:block;">Your photo stays private — it lives only inside the link, no server uploads. 🌸</span>
     </div>
 
     <!-- SONG LINK -->
@@ -195,10 +279,12 @@ header{position:relative;z-index:10;padding:1.5rem 2.5rem;display:flex;justify-c
       <div id="qr-code"></div>
       <div class="qr-label">scan to open ✦</div>
     </div>
-    <div class="link-box" id="link-display" onclick="copyLink()">Click to copy your link ✦</div>
+    <button onclick="downloadQRCode()" style="margin-top:0.8rem;padding:0.6rem 1.4rem;background:linear-gradient(135deg,#E8547A,#FF8FB8);color:white;border:none;border-radius:8px;font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;cursor:none;font-weight:600;display:inline-block;margin-bottom:1.2rem;">↓ Download QR Code</button>
+    <div class="link-box" id="link-display" onclick="copyLink()">Creating your link... 🌸</div>
     <div class="share-btns">
       <button class="btn-copy" onclick="copyLink()">Copy Link ✦</button>
-      <button class="btn-outline" onclick="testLink()">Open & Test ✦</button>
+      <button onclick="shareViaWhatsApp()" style="padding:0.85rem 1.8rem;background:linear-gradient(135deg,#25D366,#128C7E);color:white;font-size:0.74rem;letter-spacing:0.15em;text-transform:uppercase;border-radius:8px;cursor:none;border:none;font-weight:600;">WhatsApp ✦</button>
+      <button class="btn-outline" onclick="testLink()">Preview ✦</button>
       <button class="btn-outline" onclick="goBack()">Make Another</button>
     </div>
     <div class="copied-msg" id="copied-msg">✦ Copied! Now send it with love. ✦</div>
@@ -231,21 +317,18 @@ function createMusic(){
   const song=document.getElementById('inp-song').value.trim();
   const name=document.getElementById('inp-name').value.trim()||'My Love';
   const note=document.getElementById('inp-note').value.trim();
-  const picture=document.getElementById('inp-picture').value.trim();
+  const picture='';
   if(!song){alert('Please paste a song link first 🎵');return;}
-  if(state.chamber==='pic' && !picture){alert('Please paste a picture link, or switch to Voice Note + Animation 🌸');return;}
+  if(state.chamber==='pic' && !uploadedPicBase64){alert('Please choose a photo first 📷 Tap the photo area above to pick one!');return;}
 
-  const data={chamber:state.chamber,theme:state.theme,song:song,name:name,note:note,picture:picture};
+  const data={chamber:state.chamber,theme:state.theme,song:song,name:name,note:note,picture:uploadedPicBase64};
   const jsonStr=JSON.stringify(data);
   const encoded=encodeURIComponent(btoa(unescape(encodeURIComponent(jsonStr))));
   currentLink=window.location.origin+window.location.pathname.replace('musiccorner.html','')+'music-view.html?data='+encoded;
   document.getElementById('link-display').textContent=currentLink;
 
   document.getElementById('qr-code').innerHTML='';
-  new QRCode(document.getElementById('qr-code'), {
-    text: currentLink, width: 140, height: 140,
-    colorDark: "#2C2523", colorLight: "#ffffff"
-  });
+  new QRCode(document.getElementById('qr-code'), {text: currentLink, width: 180, height: 180, colorDark: "#2C2523", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M});
 
   showScreen('screen-share');
 }
