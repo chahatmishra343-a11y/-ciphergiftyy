@@ -99,10 +99,10 @@ const data=getData();
 document.getElementById('card-dear').textContent='Dear '+(data.name||'My Love')+',';
 document.getElementById('note-body').textContent=data.note||'';
 
-// Picture
+// Picture — supports both base64 and URL
 if(data.chamber==='pic' && data.picture){
   document.getElementById('pic-frame').style.display='block';
-  document.getElementById('card-pic').src=data.picture;
+  document.getElementById('card-pic').src=data.picture; // works for both base64 and URL
 }
 
 // Embed song
