@@ -260,7 +260,7 @@ function animateBurst(){
 const bgC=document.getElementById('bg-canvas'),bgCtx=bgC.getContext('2d');
 let bgW=bgC.width=window.innerWidth,bgH=bgC.height=window.innerHeight;
 window.addEventListener('resize',()=>{bgW=bgC.width=window.innerWidth;bgH=bgC.height=window.innerHeight;});
-const bgColors=['rgba(255,158,187,','rgba(232,84,122,','rgba(212,168,90,','rgba(138,159,138,'];
+const bgColors=['rgba(255,158,187,','rgba(232,84,122,','rgba(212,168,90,','rgba(122,159,130,'];
 class BGP{constructor(){this.r(true);}r(i){this.x=Math.random()*bgW;this.y=i?Math.random()*bgH:-20;this.s=Math.random()*5+2;this.sy=Math.random()*0.3+0.1;this.sx=(Math.random()-0.5)*0.2;this.op=Math.random()*0.18+0.05;this.rot=Math.random()*Math.PI*2;this.rs=(Math.random()-0.5)*0.01;this.c=bgColors[Math.floor(Math.random()*bgColors.length)];this.w=Math.random()*Math.PI*2;this.ws=Math.random()*0.01+0.003;}u(){this.w+=this.ws;this.x+=this.sx+Math.sin(this.w)*0.2;this.y+=this.sy;this.rot+=this.rs;if(this.y>bgH+15)this.r(false);}d(){bgCtx.save();bgCtx.translate(this.x,this.y);bgCtx.rotate(this.rot);bgCtx.globalAlpha=this.op;bgCtx.fillStyle=this.c+'1)';bgCtx.beginPath();bgCtx.ellipse(0,0,this.s,this.s*1.6,0,0,Math.PI*2);bgCtx.fill();bgCtx.restore();}}
 const bgPs=Array.from({length:24},()=>new BGP());
 function bgLoop(){bgCtx.clearRect(0,0,bgW,bgH);bgPs.forEach(p=>{p.u();p.d();});requestAnimationFrame(bgLoop);}
