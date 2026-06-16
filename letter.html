@@ -215,17 +215,33 @@ header{position:relative;z-index:10;padding:1.8rem 3rem;display:flex;justify-con
 
 <!-- SCREEN 5: SHARE -->
 <div class="screen" id="screen-share">
-  <div class="share-screen">
+  <div class="share-screen" style="max-width:500px;margin:0 auto;padding:3rem 2rem;text-align:center;">
     <div class="share-icon">🌸</div>
     <div class="share-title">Your letter is ready.</div>
-    <div class="share-sub">Send this link or QR code to your beloved.<br/>When they open it, your words will be waiting — like a letter that travelled through a garden.</div>
-    <div style="background:white;border:1.5px solid rgba(201,169,110,0.35);border-radius:14px;padding:1.2rem;display:inline-block;margin-bottom:1.5rem;">
-      <div id="qr-code"></div>
-      <div style="font-size:0.65rem;font-style:italic;color:var(--sepia);margin-top:0.6rem;letter-spacing:0.1em;">scan to open ✦</div>
+    <div class="share-sub">Scan the QR code or copy the short link below.<br/>When they open it, your words will be waiting — like a letter that travelled through a garden.</div>
+
+    <!-- QR CODE -->
+    <div style="margin-bottom:1.5rem;">
+      <div style="background:white;border:2px solid rgba(201,169,110,0.3);border-radius:16px;padding:1.4rem;display:inline-block;box-shadow:0 8px 30px rgba(0,0,0,0.06);">
+        <div id="qr-code"></div>
+        <div style="font-size:0.66rem;font-style:italic;color:var(--sepia);margin-top:0.6rem;letter-spacing:0.1em;">scan to open ✦</div>
+      </div>
+      <br/>
+      <button onclick="downloadQRCode()" style="margin-top:0.8rem;padding:0.6rem 1.4rem;background:linear-gradient(135deg,#E8547A,#FF8FB8);color:white;border:none;border-radius:8px;font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;cursor:none;font-weight:600;box-shadow:0 4px 14px rgba(232,84,122,0.3);transition:all 0.3s;">
+        ↓ Download QR Code
+      </button>
     </div>
-    <div class="share-link-box" id="share-link-display" onclick="copyLink()">Click to copy your gift link ✦</div>
+
+    <!-- LINK -->
+    <div style="margin-bottom:1.5rem;">
+      <div style="font-size:0.64rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:0.5rem;font-weight:600;">Your Gift Link</div>
+      <div id="share-link-display" onclick="copyLink()" style="background:white;border:1.5px solid rgba(201,169,110,0.35);border-radius:10px;padding:0.9rem 1.2rem;font-size:0.74rem;color:var(--sepia);word-break:break-all;cursor:none;transition:border-color 0.3s;font-style:italic;">Creating your link... 🌸</div>
+      <div id="shortening-status" style="font-size:0.7rem;font-style:italic;color:var(--gold);margin-top:0.4rem;"></div>
+    </div>
+
     <div class="letter-actions">
       <button class="btn-primary" onclick="copyLink()">Copy Link ✦</button>
+      <button onclick="shareWhatsAppLetter()" style="padding:0.8rem 1.6rem;background:linear-gradient(135deg,#25D366,#128C7E);color:white;font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;border-radius:6px;cursor:none;border:none;font-weight:600;">WhatsApp ✦</button>
       <button class="btn-secondary" onclick="showCategories()">Make Another</button>
     </div>
     <div class="edit-hint" id="copy-confirm" style="display:none;color:var(--sage);">✦ &nbsp;Copied! Now send it with love.&nbsp; ✦</div>
@@ -423,34 +439,91 @@ function openLetter(letter){
   showScreen('screen-letter-view');
 }
 
-function generateLink(){
-  const content=document.getElementById('letter-textarea').value;
-  const encoded=encodeURIComponent(btoa(unescape(encodeURIComponent(content))));
-  const link=`${window.location.origin}${window.location.pathname.replace('letter.html','')}read.html?letter=${encoded}`;
-  document.getElementById('share-link-display').textContent=link;
-  document.getElementById('qr-code').innerHTML='';
-  new QRCode(document.getElementById('qr-code'), {text: link, width: 140, height: 140, colorDark: "#2C2523", colorLight: "#ffffff"});
-  showScreen('screen-share');
+let currentGiftLink = '';
+
+async function shortenLink(url) {
+  try {
+    const res = await fetch('https://tinyurl.com/api-create.php?url=' + encodeURIComponent(url));
+    if (res.ok) {
+      const short = await res.text();
+      if (short.startsWith('https://tinyurl.com')) return short;
+    }
+  } catch(e) {}
+  return url;
 }
 
-function generateOwnLink(){
+async function generateLink(){
+  const content=document.getElementById('letter-textarea').value;
+  const encoded=encodeURIComponent(btoa(unescape(encodeURIComponent(content))));
+  const longLink=`${window.location.origin}${window.location.pathname.replace('letter.html','')}read.html?letter=${encoded}`;
+  showScreen('screen-share');
+  document.getElementById('share-link-display').textContent='Creating your link... 🌸';
+  document.getElementById('shortening-status').textContent='Shortening link...';
+  const shortLink = await shortenLink(longLink);
+  currentGiftLink = shortLink;
+  document.getElementById('share-link-display').textContent=shortLink;
+  document.getElementById('shortening-status').textContent='';
+  document.getElementById('qr-code').innerHTML='';
+  new QRCode(document.getElementById('qr-code'), {text: shortLink, width: 180, height: 180, colorDark: '#2C2523', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M});
+}
+
+async function generateOwnLink(){
   const content=document.getElementById('own-textarea').value;
   if(!content.trim()){alert('Please write something first. 🌸');return;}
   const encoded=encodeURIComponent(btoa(unescape(encodeURIComponent(content))));
-  const link=`${window.location.origin}${window.location.pathname.replace('letter.html','')}read.html?letter=${encoded}`;
-  document.getElementById('share-link-display').textContent=link;
-  document.getElementById('qr-code').innerHTML='';
-  new QRCode(document.getElementById('qr-code'), {text: link, width: 140, height: 140, colorDark: "#2C2523", colorLight: "#ffffff"});
+  const longLink=`${window.location.origin}${window.location.pathname.replace('letter.html','')}read.html?letter=${encoded}`;
   showScreen('screen-share');
+  document.getElementById('share-link-display').textContent='Creating your link... 🌸';
+  document.getElementById('shortening-status').textContent='Shortening link...';
+  const shortLink = await shortenLink(longLink);
+  currentGiftLink = shortLink;
+  document.getElementById('share-link-display').textContent=shortLink;
+  document.getElementById('shortening-status').textContent='';
+  document.getElementById('qr-code').innerHTML='';
+  new QRCode(document.getElementById('qr-code'), {text: shortLink, width: 180, height: 180, colorDark: '#2C2523', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M});
 }
 
 function copyLink(){
-  const link=document.getElementById('share-link-display').textContent;
-  navigator.clipboard.writeText(link).then(()=>{
+  navigator.clipboard.writeText(currentGiftLink||document.getElementById('share-link-display').textContent).then(()=>{
     const c=document.getElementById('copy-confirm');
     c.style.display='block';
     setTimeout(()=>c.style.display='none',3000);
   });
+}
+
+function downloadQRCode(){
+  const el=document.getElementById('qr-code');
+  const canvas=el.querySelector('canvas');
+  const img=el.querySelector('img');
+  if(canvas){
+    const pad=20;
+    const out=document.createElement('canvas');
+    out.width=canvas.width+pad*2;
+    out.height=canvas.height+pad*2+24;
+    const ctx=out.getContext('2d');
+    ctx.fillStyle='#ffffff';
+    ctx.fillRect(0,0,out.width,out.height);
+    ctx.drawImage(canvas,pad,pad);
+    ctx.fillStyle='#2C2523';
+    ctx.font='13px serif';
+    ctx.textAlign='center';
+    ctx.fillText('Scan to open your gift 🌸',out.width/2,out.height-6);
+    const link=document.createElement('a');
+    link.download='ciphergiftyy-gift-qr.png';
+    link.href=out.toDataURL('image/png');
+    link.click();
+  } else if(img){
+    const link=document.createElement('a');
+    link.download='ciphergiftyy-gift-qr.png';
+    link.href=img.src;
+    link.click();
+  }
+}
+
+function shareWhatsAppLetter(){
+  const link=currentGiftLink||document.getElementById('share-link-display').textContent;
+  const text='I made something for you 🌸\n'+link;
+  window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
 }
 
 // Canvas
