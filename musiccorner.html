@@ -313,24 +313,25 @@ function pickTheme(t){
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
 function goBack(){showScreen('screen-composer');}
 
-function createMusic(){
+async function createMusic(){
   const song=document.getElementById('inp-song').value.trim();
   const name=document.getElementById('inp-name').value.trim()||'My Love';
   const note=document.getElementById('inp-note').value.trim();
-  const picture='';
+  const picture=uploadedPicBase64||'';
   if(!song){alert('Please paste a song link first 🎵');return;}
-  if(state.chamber==='pic' && !uploadedPicBase64){alert('Please choose a photo first 📷 Tap the photo area above to pick one!');return;}
-
-  const data={chamber:state.chamber,theme:state.theme,song:song,name:name,note:note,picture:uploadedPicBase64};
+  if(state.chamber==='pic' && !picture){alert('Please choose a photo first 📷');return;}
+  const data={chamber:state.chamber,theme:state.theme,song:song,name:name,note:note,picture:picture};
   const jsonStr=JSON.stringify(data);
   const encoded=encodeURIComponent(btoa(unescape(encodeURIComponent(jsonStr))));
-  currentLink=window.location.origin+window.location.pathname.replace('musiccorner.html','')+'music-view.html?data='+encoded;
-  document.getElementById('link-display').textContent=currentLink;
-
-  document.getElementById('qr-code').innerHTML='';
-  new QRCode(document.getElementById('qr-code'), {text: currentLink, width: 180, height: 180, colorDark: "#2C2523", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M});
-
+  const longLink=window.location.origin+window.location.pathname.replace('musiccorner.html','')+'music-view.html?data='+encoded;
   showScreen('screen-share');
+  document.getElementById('link-display').textContent='Creating your link... 🌸';
+  const shortLink = await shortenLink(longLink);
+  currentGiftLink = shortLink;
+  currentLink = shortLink;
+  document.getElementById('link-display').textContent=shortLink;
+  document.getElementById('qr-code').innerHTML='';
+  new QRCode(document.getElementById('qr-code'), {text: shortLink, width: 180, height: 180, colorDark: "#2C2523", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M});
 }
 
 function testLink(){
@@ -338,7 +339,7 @@ function testLink(){
 }
 
 function copyLink(){
-  navigator.clipboard.writeText(currentLink).then(()=>{
+  navigator.clipboard.writeText(currentGiftLink||currentLink).then(()=>{
     const m=document.getElementById('copied-msg');
     m.style.display='block';
     setTimeout(()=>m.style.display='none',3000);
