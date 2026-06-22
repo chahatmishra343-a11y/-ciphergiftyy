@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CipherGiftyy — The Gift Box</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IM+Fell+English:ital@0;1&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--ivory:#FFF9F4;--linen:#FFF0E8;--ink:#2C2523;--sepia:#5C3D2E;--rose:#E8547A;--gold:#D4A85A;--gold-light:#F0D9A8;--sage:#7A9F82;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{min-height:100vh;background:linear-gradient(160deg,var(--ivory),var(--linen));font-family:'Lora',serif;color:var(--ink);cursor:none;overflow-x:hidden;}
+.cursor{width:10px;height:10px;border-radius:50%;background:var(--rose);position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply;}
+.cursor-ring{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--gold);position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);}
+#petals-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+
+header{position:relative;z-index:10;padding:1.5rem 2.5rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(212,168,90,0.2);background:rgba(255,249,244,0.8);backdrop-filter:blur(8px);}
+.back-home{font-style:italic;font-size:0.75rem;letter-spacing:0.12em;color:var(--gold);text-decoration:none;transition:color 0.3s;}
+.back-home:hover{color:var(--rose);}
+.logo{font-family:'IM Fell English',serif;font-size:1.15rem;color:var(--ink);}
+.logo span{color:var(--rose);}
+.header-tag{font-style:italic;font-size:0.7rem;color:var(--sepia);}
+
+.screen{display:none;position:relative;z-index:10;}
+.screen.active{display:block;}
+
+/* COMPOSER */
+.composer{max-width:700px;margin:0 auto;padding:3rem 2rem 5rem;animation:fadeUp 0.8s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.section-label{font-size:0.62rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rose);display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1rem;font-weight:600;}
+.section-label::before,.section-label::after{content:'';display:inline-block;width:40px;height:1px;background:var(--gold-light);}
+.page-title{font-family:'IM Fell English',serif;font-size:2.4rem;font-style:italic;text-align:center;margin-bottom:0.5rem;}
+.page-sub{font-style:italic;font-size:0.84rem;color:var(--sepia);text-align:center;line-height:1.8;margin-bottom:2.5rem;}
+
+.field-group{margin-bottom:2rem;}
+.field-label{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--rose);margin-bottom:0.8rem;display:block;font-weight:600;}
+.field-input,.field-textarea{width:100%;background:white;border:1.5px solid rgba(212,168,90,0.3);border-radius:10px;padding:0.9rem 1.2rem;font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic;color:var(--sepia);outline:none;cursor:text;transition:border-color 0.3s;}
+.field-input:focus,.field-textarea:focus{border-color:var(--rose);}
+.field-textarea{min-height:80px;resize:none;line-height:1.8;}
+.field-hint{font-size:0.66rem;font-style:italic;color:var(--sepia);margin-top:0.5rem;display:block;}
+
+/* CHAMBER BUTTONS */
+.chamber-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;}
+.chamber-card{border:2px solid rgba(212,168,90,0.25);border-radius:14px;padding:1.6rem 1.4rem;cursor:none;transition:all 0.3s;position:relative;text-align:center;}
+.chamber-card.selected{border-color:var(--rose);box-shadow:0 0 0 4px rgba(232,84,122,0.15);}
+.chamber-card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(0,0,0,0.07);}
+.chamber-pic{background:linear-gradient(135deg,#FFE8EF,#FFC4D4);}
+.chamber-cake{background:linear-gradient(135deg,#FFF3D6,#FFD98A);}
+.check-badge{position:absolute;top:0.6rem;right:0.6rem;width:20px;height:20px;border-radius:50%;background:var(--rose);color:white;font-size:0.65rem;display:none;align-items:center;justify-content:center;font-weight:bold;}
+.chamber-card.selected .check-badge{display:flex;}
+.chamber-icon{font-size:2.2rem;margin-bottom:0.6rem;}
+.chamber-name{font-family:'IM Fell English',serif;font-size:1.05rem;font-style:italic;color:var(--ink);margin-bottom:0.3rem;}
+.chamber-desc{font-size:0.72rem;color:var(--sepia);font-style:italic;line-height:1.6;}
+
+/* BOX STYLE PICKER */
+.box-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.8rem;}
+.box-card{border:2px solid rgba(212,168,90,0.2);border-radius:10px;padding:0.8rem 0.5rem;cursor:none;transition:all 0.3s;text-align:center;position:relative;}
+.box-card.selected{border-color:var(--rose);box-shadow:0 0 0 4px rgba(232,84,122,0.12);}
+.box-card:hover{transform:translateY(-2px);}
+.box-preview{width:48px;height:48px;margin:0 auto 0.5rem;position:relative;}
+.box-name{font-size:0.62rem;font-style:italic;color:var(--sepia);}
+.box-card.selected .check-badge{display:flex;}
+
+/* Drawn box shapes */
+.box-classic .box-body{width:48px;height:36px;background:linear-gradient(160deg,#E8547A,#FF8FB8);border-radius:3px;position:absolute;bottom:0;}
+.box-classic .box-lid{width:52px;height:14px;background:linear-gradient(160deg,#C9384A,#E8547A);border-radius:3px 3px 0 0;position:absolute;top:0;left:-2px;}
+.box-classic .box-ribbon-v{width:4px;height:36px;background:#FFF;position:absolute;left:22px;bottom:0;opacity:0.5;}
+.box-classic .box-ribbon-h{width:48px;height:4px;background:#FFF;position:absolute;bottom:16px;opacity:0.5;}
+
+.box-purple .box-body{width:48px;height:36px;background:linear-gradient(160deg,#9B59B6,#D4A8E8);border-radius:3px;position:absolute;bottom:0;}
+.box-purple .box-lid{width:52px;height:14px;background:linear-gradient(160deg,#7D3C98,#9B59B6);border-radius:3px 3px 0 0;position:absolute;top:0;left:-2px;}
+.box-purple .box-ribbon-v{width:4px;height:36px;background:#FFE8F7;position:absolute;left:22px;bottom:0;opacity:0.6;}
+.box-purple .box-ribbon-h{width:48px;height:4px;background:#FFE8F7;position:absolute;bottom:16px;opacity:0.6;}
+
+.box-gold .box-body{width:48px;height:36px;background:linear-gradient(160deg,#D4A85A,#F0D9A8);border-radius:3px;position:absolute;bottom:0;}
+.box-gold .box-lid{width:52px;height:14px;background:linear-gradient(160deg,#B8860B,#D4A85A);border-radius:3px 3px 0 0;position:absolute;top:0;left:-2px;}
+.box-gold .box-ribbon-v{width:4px;height:36px;background:#FFF;position:absolute;left:22px;bottom:0;opacity:0.5;}
+.box-gold .box-ribbon-h{width:48px;height:4px;background:#FFF;position:absolute;bottom:16px;opacity:0.5;}
+
+.box-blue .box-body{width:48px;height:36px;background:linear-gradient(160deg,#3498DB,#A8D4F8);border-radius:3px;position:absolute;bottom:0;}
+.box-blue .box-lid{width:52px;height:14px;background:linear-gradient(160deg,#1A6FA8,#3498DB);border-radius:3px 3px 0 0;position:absolute;top:0;left:-2px;}
+.box-blue .box-ribbon-v{width:4px;height:36px;background:#FFF;position:absolute;left:22px;bottom:0;opacity:0.5;}
+.box-blue .box-ribbon-h{width:48px;height:4px;background:#FFF;position:absolute;bottom:16px;opacity:0.5;}
+
+/* CAKE PICKER */
+.cake-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.8rem;}
+.cake-card{border:2px solid rgba(212,168,90,0.2);border-radius:10px;padding:0.8rem 0.5rem;cursor:none;transition:all 0.3s;text-align:center;position:relative;}
+.cake-card.selected{border-color:var(--rose);box-shadow:0 0 0 4px rgba(232,84,122,0.12);}
+.cake-card:hover{transform:translateY(-2px);}
+.cake-card.selected .check-badge{display:flex;}
+.cake-emoji{font-size:2rem;margin-bottom:0.4rem;}
+.cake-name{font-size:0.62rem;font-style:italic;color:var(--sepia);}
+
+/* ANIMAL PICKER */
+.animal-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:0.6rem;}
+.animal-chip{border:2px solid rgba(212,168,90,0.2);border-radius:8px;padding:0.6rem 0.3rem;cursor:none;transition:all 0.3s;text-align:center;background:white;font-size:1.8rem;}
+.animal-chip.selected{border-color:var(--rose);background:linear-gradient(135deg,#FFF0F4,#FFF8FB);box-shadow:0 0 0 3px rgba(232,84,122,0.12);}
+
+/* PHOTO UPLOAD */
+.upload-area{width:100%;background:white;border:2px dashed rgba(212,168,90,0.4);border-radius:12px;padding:2rem 1.2rem;text-align:center;cursor:none;transition:all 0.3s;}
+.upload-area:hover{border-color:var(--rose);}
+#photo-preview{display:none;max-width:100%;max-height:220px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.1);}
+
+.deckle{width:100%;height:8px;background:repeating-linear-gradient(90deg,transparent 0 6px,var(--gold-light) 6px 8px);opacity:0.5;border-radius:4px;margin:1.8rem 0;}
+.btn-create{width:100%;padding:1.1rem;background:linear-gradient(135deg,var(--rose),#FF8FB8);color:white;font-size:0.78rem;letter-spacing:0.18em;text-transform:uppercase;border:none;border-radius:10px;cursor:none;transition:all 0.3s;font-weight:600;box-shadow:0 8px 24px rgba(232,84,122,0.3);}
+.btn-create:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(232,84,122,0.4);}
+.hidden-field{display:none;}
+
+/* SHARE SCREEN */
+.share-wrap{max-width:500px;margin:0 auto;padding:4rem 2rem;text-align:center;animation:fadeUp 0.8s ease both;}
+.share-icon{font-size:3rem;margin-bottom:1.2rem;}
+.share-title{font-family:'IM Fell English',serif;font-size:1.9rem;font-style:italic;margin-bottom:0.6rem;}
+.share-sub{font-style:italic;font-size:0.82rem;color:var(--sepia);line-height:1.8;margin-bottom:1.8rem;}
+.qr-box{background:white;border:2px solid rgba(212,168,90,0.3);border-radius:16px;padding:1.4rem;display:inline-block;box-shadow:0 8px 30px rgba(0,0,0,0.06);margin-bottom:0.8rem;}
+.qr-label{font-size:0.66rem;font-style:italic;color:var(--sepia);margin-top:0.6rem;letter-spacing:0.1em;}
+.btn-dl-qr{margin-top:0.6rem;padding:0.55rem 1.2rem;background:linear-gradient(135deg,var(--rose),#FF8FB8);color:white;border:none;border-radius:8px;font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;cursor:none;font-weight:600;display:inline-block;margin-bottom:1.2rem;}
+.link-box{background:white;border:1.5px solid rgba(212,168,90,0.35);border-radius:10px;padding:0.9rem 1.2rem;font-size:0.74rem;color:var(--sepia);margin-bottom:1.2rem;word-break:break-all;cursor:none;font-style:italic;}
+.share-btns{display:flex;gap:0.8rem;justify-content:center;flex-wrap:wrap;}
+.btn-copy{padding:0.85rem 1.8rem;background:linear-gradient(135deg,var(--rose),#FF8FB8);color:white;font-size:0.74rem;letter-spacing:0.15em;text-transform:uppercase;border-radius:8px;cursor:none;border:none;font-weight:600;box-shadow:0 6px 18px rgba(232,84,122,0.3);}
+.btn-wa{padding:0.85rem 1.8rem;background:linear-gradient(135deg,#25D366,#128C7E);color:white;font-size:0.74rem;letter-spacing:0.15em;text-transform:uppercase;border-radius:8px;cursor:none;border:none;font-weight:600;}
+.btn-outline{padding:0.85rem 1.8rem;background:white;color:var(--sepia);font-size:0.74rem;letter-spacing:0.15em;text-transform:uppercase;border-radius:8px;cursor:none;border:1.5px solid rgba(212,168,90,0.4);font-weight:600;}
+.copied-msg{font-style:italic;font-size:0.72rem;color:var(--sage);display:none;margin-top:0.5rem;}
+
+@media(max-width:600px){
+  .chamber-grid{grid-template-columns:1fr;}
+  .box-grid,.cake-grid{grid-template-columns:repeat(2,1fr);}
+  .animal-grid{grid-template-columns:repeat(4,1fr);}
+  .composer{padding:2rem 1rem 4rem;}
+  header{padding:1.2rem 1.5rem;flex-direction:column;gap:0.5rem;}
+}
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+<canvas id="petals-canvas"></canvas>
+
+<header>
+  <a href="index.html" class="back-home">← Return to the Garden</a>
+  <div class="logo">✦ Cipher<span>Giftyy</span></div>
+  <div class="header-tag">The Gift Box 🎁</div>
+</header>
+
+<!-- SCREEN 1: COMPOSER -->
+<div class="screen active" id="screen-composer">
+  <div class="composer">
+    <div class="section-label">The Gift Box</div>
+    <div class="page-title">Wrap something beautiful.</div>
+    <div class="page-sub">A box that shakes, bursts open, and reveals something made just for them. Choose your chamber and fill it with love.</div>
+
+    <!-- CHAMBER -->
+    <div class="field-group">
+      <span class="field-label">✦ Choose Your Chamber</span>
+      <div class="chamber-grid">
+        <div class="chamber-card chamber-pic selected" id="ch-pic" onclick="pickChamber('pic')">
+          <div class="check-badge">✓</div>
+          <div class="chamber-icon">📸</div>
+          <div class="chamber-name">Pic + Letter</div>
+          <div class="chamber-desc">Box bursts → your photo appears → a love letter unfolds</div>
+        </div>
+        <div class="chamber-card chamber-cake" id="ch-cake" onclick="pickChamber('cake')">
+          <div class="check-badge">✓</div>
+          <div class="chamber-icon">🎂</div>
+          <div class="chamber-name">Cake + Message</div>
+          <div class="chamber-desc">Box bursts → cake appears → cute animal holds your note</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOX STYLE -->
+    <div class="field-group">
+      <span class="field-label">✦ Box Style</span>
+      <div class="box-grid">
+        <div class="box-card box-classic selected" id="box-rose" onclick="pickBox('rose')">
+          <div class="check-badge">✓</div>
+          <div class="box-preview"><div class="box-body"></div><div class="box-lid"></div><div class="box-ribbon-v"></div><div class="box-ribbon-h"></div></div>
+          <div class="box-name">Rose Pink</div>
+        </div>
+        <div class="box-card box-purple" id="box-purple" onclick="pickBox('purple')">
+          <div class="check-badge">✓</div>
+          <div class="box-preview"><div class="box-body"></div><div class="box-lid"></div><div class="box-ribbon-v"></div><div class="box-ribbon-h"></div></div>
+          <div class="box-name">Lavender</div>
+        </div>
+        <div class="box-card box-gold" id="box-gold" onclick="pickBox('gold')">
+          <div class="check-badge">✓</div>
+          <div class="box-preview"><div class="box-body"></div><div class="box-lid"></div><div class="box-ribbon-v"></div><div class="box-ribbon-h"></div></div>
+          <div class="box-name">Gold</div>
+        </div>
+        <div class="box-card box-blue" id="box-blue" onclick="pickBox('blue')">
+          <div class="check-badge">✓</div>
+          <div class="box-preview"><div class="box-body"></div><div class="box-lid"></div><div class="box-ribbon-v"></div><div class="box-ribbon-h"></div></div>
+          <div class="box-name">Sky Blue</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHOTO UPLOAD (pic chamber) -->
+    <div class="field-group" id="field-photo">
+      <label class="field-label">✦ Their Photo</label>
+      <div class="upload-area" id="upload-area" onclick="document.getElementById('photo-input').click()">
+        <div id="upload-placeholder">
+          <div style="font-size:2rem;margin-bottom:0.5rem;">🖼️</div>
+          <div style="font-family:'IM Fell English',serif;font-size:1rem;font-style:italic;color:var(--ink);margin-bottom:0.3rem;">Tap to choose a photo</div>
+          <div style="font-size:0.7rem;font-style:italic;color:var(--sepia);">from your gallery or Google Photos</div>
+        </div>
+        <img id="photo-preview" src="" alt="Preview"/>
+        <div id="photo-change" style="display:none;margin-top:0.5rem;font-size:0.68rem;font-style:italic;color:var(--gold);">tap to change photo</div>
+      </div>
+      <input type="file" id="photo-input" accept="image/*" style="display:none;" onchange="handlePhoto(this)"/>
+    </div>
+
+    <!-- CAKE PICKER (cake chamber) -->
+    <div class="field-group hidden-field" id="field-cake">
+      <span class="field-label">✦ Choose a Cake</span>
+      <div class="cake-grid">
+        <div class="cake-card selected" id="cake-birthday" onclick="pickCake('birthday')">
+          <div class="check-badge">✓</div>
+          <div class="cake-emoji">🎂</div>
+          <div class="cake-name">Birthday</div>
+        </div>
+        <div class="cake-card" id="cake-strawberry" onclick="pickCake('strawberry')">
+          <div class="check-badge">✓</div>
+          <div class="cake-emoji">🍓</div>
+          <div class="cake-name">Strawberry</div>
+        </div>
+        <div class="cake-card" id="cake-chocolate" onclick="pickCake('chocolate')">
+          <div class="check-badge">✓</div>
+          <div class="cake-emoji">🍫</div>
+          <div class="cake-name">Chocolate</div>
+        </div>
+        <div class="cake-card" id="cake-cupcake" onclick="pickCake('cupcake')">
+          <div class="check-badge">✓</div>
+          <div class="cake-emoji">🧁</div>
+          <div class="cake-name">Cupcake</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANIMAL PICKER (cake chamber) -->
+    <div class="field-group hidden-field" id="field-animal">
+      <span class="field-label">✦ Choose an Animal Messenger</span>
+      <div class="animal-grid">
+        <div class="animal-chip selected" id="animal-panda" onclick="pickAnimal('panda','🐼')">🐼</div>
+        <div class="animal-chip" id="animal-bear" onclick="pickAnimal('bear','🐻')">🐻</div>
+        <div class="animal-chip" id="animal-bunny" onclick="pickAnimal('bunny','🐰')">🐰</div>
+        <div class="animal-chip" id="animal-cat" onclick="pickAnimal('cat','🐱')">🐱</div>
+        <div class="animal-chip" id="animal-dog" onclick="pickAnimal('dog','🐶')">🐶</div>
+        <div class="animal-chip" id="animal-dino" onclick="pickAnimal('dino','🦕')">🦕</div>
+        <div class="animal-chip" id="animal-fox" onclick="pickAnimal('fox','🦊')">🦊</div>
+        <div class="animal-chip" id="animal-penguin" onclick="pickAnimal('penguin','🐧')">🐧</div>
+        <div class="animal-chip" id="animal-lion" onclick="pickAnimal('lion','🦁')">🦁</div>
+        <div class="animal-chip" id="animal-dragon" onclick="pickAnimal('dragon','🐲')">🐲</div>
+      </div>
+    </div>
+
+    <!-- NAME -->
+    <div class="field-group">
+      <label class="field-label">✦ Their Name</label>
+      <input class="field-input" id="inp-name" type="text" placeholder="Sarah, Rohan, My Love..."/>
+    </div>
+
+    <!-- LETTER / NOTE -->
+    <div class="field-group">
+      <label class="field-label" id="note-label">✦ Your Letter</label>
+      <textarea class="field-textarea" id="inp-note" placeholder="Write your message here... it can be as long or as short as your heart needs." style="min-height:140px;"></textarea>
+    </div>
+
+    <div class="deckle"></div>
+    <button class="btn-create" onclick="createGift()">Wrap My Gift ✦</button>
+  </div>
+</div>
+
+<!-- SCREEN 2: SHARE -->
+<div class="screen" id="screen-share">
+  <div class="share-wrap">
+    <div class="share-icon">🎁</div>
+    <div class="share-title">Your gift is wrapped.</div>
+    <div class="share-sub">Scan the QR or copy the short link.<br/>When they open it, the box will shake, burst open, and reveal your surprise.</div>
+    <div class="qr-box"><div id="qr-code"></div><div class="qr-label">scan to open ✦</div></div>
+    <br/>
+    <button class="btn-dl-qr" onclick="downloadQR()">↓ Download QR Code</button>
+    <div class="link-box" id="link-display">Creating your gift link... 🌸</div>
+    <div class="share-btns">
+      <button class="btn-copy" onclick="copyLink()">Copy Link ✦</button>
+      <button class="btn-wa" onclick="shareWA()">WhatsApp ✦</button>
+      <button class="btn-outline" onclick="goBack()">Make Another</button>
+    </div>
+    <div class="copied-msg" id="copied-msg">✦ Copied! Now send it with love. ✦</div>
+  </div>
+</div>
+
+<script>
+// Cursor
+const cur=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+document.addEventListener('mousemove',e=>{cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';setTimeout(()=>{ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px';},80);});
+
+let state={chamber:'pic',box:'rose',cake:'birthday',animal:'panda',animalEmoji:'🐼'};
+let photoBase64='';
+let currentGiftLink='';
+
+function pickChamber(c){
+  state.chamber=c;
+  document.querySelectorAll('.chamber-card').forEach(x=>x.classList.remove('selected'));
+  document.getElementById('ch-'+c).classList.add('selected');
+  // Show/hide fields
+  document.getElementById('field-photo').classList.toggle('hidden-field',c!=='pic');
+  document.getElementById('field-cake').classList.toggle('hidden-field',c!=='cake');
+  document.getElementById('field-animal').classList.toggle('hidden-field',c!=='cake');
+  document.getElementById('note-label').textContent = c==='pic' ? '✦ Your Letter' : '✦ Small Note';
+  document.getElementById('inp-note').placeholder = c==='pic'
+    ? 'Write your letter here — as long or short as your heart needs...'
+    : 'A tiny message... "Happy Birthday my love" or just their name 🌸';
+}
+
+function pickBox(b){
+  state.box=b;
+  document.querySelectorAll('.box-card').forEach(x=>x.classList.remove('selected'));
+  document.getElementById('box-'+b).classList.add('selected');
+}
+
+function pickCake(c){
+  state.cake=c;
+  document.querySelectorAll('.cake-card').forEach(x=>x.classList.remove('selected'));
+  document.getElementById('cake-'+c).classList.add('selected');
+}
+
+function pickAnimal(id,emoji){
+  state.animal=id; state.animalEmoji=emoji;
+  document.querySelectorAll('.animal-chip').forEach(x=>x.classList.remove('selected'));
+  document.getElementById('animal-'+id).classList.add('selected');
+}
+
+// Photo upload
+function handlePhoto(input){
+  if(!input.files||!input.files[0])return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const img=new Image();
+    img.onload=function(){
+      const MAX=480;
+      let w=img.width,h=img.height;
+      if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}
+      const canvas=document.createElement('canvas');
+      canvas.width=w;canvas.height=h;
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0,w,h);
+      photoBase64=canvas.toDataURL('image/jpeg',0.72);
+      const sizeKB=Math.round(photoBase64.length*0.75/1024);
+      if(sizeKB>80) photoBase64=canvas.toDataURL('image/jpeg',0.45);
+      document.getElementById('upload-placeholder').style.display='none';
+      document.getElementById('photo-preview').src=photoBase64;
+      document.getElementById('photo-preview').style.display='block';
+      document.getElementById('photo-change').style.display='block';
+      document.getElementById('upload-area').style.borderStyle='solid';
+      document.getElementById('upload-area').style.borderColor='rgba(232,84,122,0.4)';
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+// Shortener
+async function shortenLink(url){
+  try{
+    const res=await fetch('https://tinyurl.com/api-create.php?url='+encodeURIComponent(url));
+    if(res.ok){const s=await res.text();if(s.startsWith('https://tinyurl.com'))return s;}
+  }catch(e){}
+  return url;
+}
+
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+function goBack(){showScreen('screen-composer');}
+
+async function createGift(){
+  const name=document.getElementById('inp-name').value.trim()||'My Love';
+  const note=document.getElementById('inp-note').value.trim();
+  if(state.chamber==='pic'&&!photoBase64){alert('Please choose a photo first 📷');return;}
+  if(!note){alert('Please write a message 🌸');return;}
+  const data={
+    chamber:state.chamber,
+    box:state.box,
+    cake:state.cake,
+    animal:state.animalEmoji,
+    name,note,
+    photo:photoBase64
+  };
+  const encoded=encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(data)))));
+  const longLink=window.location.origin+window.location.pathname.replace('giftbox.html','')+'gift-view.html?data='+encoded;
+  showScreen('screen-share');
+  document.getElementById('link-display').textContent='Creating your gift link... 🌸';
+  const shortLink=await shortenLink(longLink);
+  currentGiftLink=shortLink;
+  document.getElementById('link-display').textContent=shortLink;
+  document.getElementById('qr-code').innerHTML='';
+  new QRCode(document.getElementById('qr-code'),{text:shortLink,width:180,height:180,colorDark:'#2C2523',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+}
+
+function copyLink(){
+  navigator.clipboard.writeText(currentGiftLink).then(()=>{
+    const m=document.getElementById('copied-msg');m.style.display='block';
+    setTimeout(()=>m.style.display='none',3000);
+  });
+}
+
+function downloadQR(){
+  const el=document.getElementById('qr-code');
+  const canvas=el.querySelector('canvas');
+  if(canvas){
+    const pad=20;const out=document.createElement('canvas');
+    out.width=canvas.width+pad*2;out.height=canvas.height+pad*2+24;
+    const ctx=out.getContext('2d');ctx.fillStyle='#ffffff';ctx.fillRect(0,0,out.width,out.height);
+    ctx.drawImage(canvas,pad,pad);ctx.fillStyle='#2C2523';ctx.font='13px serif';ctx.textAlign='center';
+    ctx.fillText('Scan to open your gift 🌸',out.width/2,out.height-6);
+    const a=document.createElement('a');a.download='ciphergiftyy-gift-qr.png';a.href=out.toDataURL('image/png');a.click();
+  }
+}
+
+function shareWA(){
+  window.open('https://wa.me/?text='+encodeURIComponent('I wrapped something for you 🎁\n'+currentGiftLink),'_blank');
+}
+
+// BG Canvas
+const bgC=document.getElementById('petals-canvas'),bgCtx=bgC.getContext('2d');
+let bgW=bgC.width=window.innerWidth,bgH=bgC.height=window.innerHeight;
+window.addEventListener('resize',()=>{bgW=bgC.width=window.innerWidth;bgH=bgC.height=window.innerHeight;});
+const bgCols=['rgba(232,84,122,','rgba(255,179,210,','rgba(212,168,90,','rgba(122,159,130,','rgba(255,214,168,'];
+class BGP{constructor(){this.r(true);}r(i){this.x=Math.random()*bgW;this.y=i?Math.random()*bgH:-20;this.s=Math.random()*5+2;this.sy=Math.random()*0.35+0.12;this.sx=(Math.random()-0.5)*0.2;this.op=Math.random()*0.22+0.08;this.rot=Math.random()*Math.PI*2;this.rs=(Math.random()-0.5)*0.01;this.c=bgCols[Math.floor(Math.random()*bgCols.length)];this.w=Math.random()*Math.PI*2;this.ws=Math.random()*0.01+0.003;}u(){this.w+=this.ws;this.x+=this.sx+Math.sin(this.w)*0.2;this.y+=this.sy;this.rot+=this.rs;if(this.y>bgH+15)this.r(false);}d(){bgCtx.save();bgCtx.translate(this.x,this.y);bgCtx.rotate(this.rot);bgCtx.globalAlpha=this.op;bgCtx.fillStyle=this.c+'1)';bgCtx.beginPath();bgCtx.ellipse(0,0,this.s,this.s*1.6,0,0,Math.PI*2);bgCtx.fill();bgCtx.restore();}}
+const bgPs=Array.from({length:30},()=>new BGP());
+function bgLoop(){bgCtx.clearRect(0,0,bgW,bgH);bgPs.forEach(p=>{p.u();p.d();});requestAnimationFrame(bgLoop);}
+bgLoop();
+</script>
+</body>
+</html>
